@@ -3,16 +3,57 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/jutkko/copy-pasta/store"
+	minio "github.com/minio/minio-go"
 )
 
 func main() {
-	var input []string
-
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		input = append(input, scanner.Text())
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	fmt.Printf("Stdin was: %#+v\n", input)
+	// stdin is pipe
+	if (stat.Mode() & os.ModeCharDevice) == 0 {
+		var input []string
+		fmt.Printf("Terminal: %#+v...\n", input)
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			input = append(input, scanner.Text())
+		}
+
+		fmt.Printf("Storing: %#+v...\n", input)
+		client, err := minioClient()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		bucketName, location := s3BucketInfo()
+		err = store.S3Write(client, bucketName, location, input)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		// stdin is tty
+		println("Getting the last copied item...")
+	}
+}
+
+func minioClient() (*minio.Client, error) {
+	endpoint := os.Getenv("S3ENDPOINT")
+	accessKeyID := os.Getenv("S3ACCESSKEYID")
+	secretAccessKey := os.Getenv("S3SECRETACCESSKEY")
+	useSSL := true
+
+	// Initialize minio client object.
+	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
+}
+
+func s3BucketInfo() (string, string) {
+	bucketName := os.Getenv("S3BUCKETNAME")
+	location := os.Getenv("S3LOCATION")
+	return bucketName, location
 }
