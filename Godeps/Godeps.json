@@ -1,0 +1,32 @@
+{
+	"ImportPath": "github.com/jutkko/copy-pasta",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v78",
+	"Deps": [
+		{
+			"ImportPath": "github.com/minio/minio-go",
+			"Comment": "v2.0.3-6-g83ba3bc",
+			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		},
+		{
+			"ImportPath": "github.com/minio/minio-go/pkg/policy",
+			"Comment": "v2.0.3-6-g83ba3bc",
+			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		},
+		{
+			"ImportPath": "github.com/minio/minio-go/pkg/s3signer",
+			"Comment": "v2.0.3-6-g83ba3bc",
+			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		},
+		{
+			"ImportPath": "github.com/minio/minio-go/pkg/s3utils",
+			"Comment": "v2.0.3-6-g83ba3bc",
+			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		},
+		{
+			"ImportPath": "github.com/minio/minio-go/pkg/set",
+			"Comment": "v2.0.3-6-g83ba3bc",
+			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		}
+	]
+}
