@@ -29,17 +29,17 @@ func main() {
 			input = append(input, scanner.Text())
 		}
 
-		bucketName, location := s3BucketInfo()
-		err = store.S3Write(client, bucketName, location, input)
+		bucketName, objectName, location := s3BucketInfo()
+		err = store.S3Write(client, bucketName, objectName, location, input)
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
 	} else {
 		// stdin is tty
 		println("Getting the last copied item...")
-		bucketName, _ := s3BucketInfo()
+		bucketName, objectName, _ := s3BucketInfo()
 
-		content, err := store.S3Read(client, bucketName, "zhou-test-object-real-shit")
+		content, err := store.S3Read(client, bucketName, objectName)
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed writing to read bucket: %s\n", err.Error()))
 		}
@@ -57,8 +57,9 @@ func minioClient() (*minio.Client, error) {
 	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
 }
 
-func s3BucketInfo() (string, string) {
+func s3BucketInfo() (string, string, string) {
 	bucketName := os.Getenv("S3BUCKETNAME")
+	objectName := os.Getenv("S3OBJECTNAME")
 	location := os.Getenv("S3LOCATION")
-	return bucketName, location
+	return bucketName, objectName, location
 }

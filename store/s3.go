@@ -17,7 +17,7 @@ type MinioClient interface {
 	FGetObject(string, string, string) error
 }
 
-func S3Write(client MinioClient, bucketName, location string, content []string) error {
+func S3Write(client MinioClient, bucketName, objectName, location string, content []string) error {
 	exists, err := client.BucketExists(bucketName)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func S3Write(client MinioClient, bucketName, location string, content []string) 
 		}
 	}
 
-	_, err = client.PutObject(bucketName, "zhou-test-object-real-shit", bytes.NewReader([]byte(content[0])), "text/html")
+	_, err = client.PutObject(bucketName, objectName, bytes.NewReader([]byte(content[0])), "text/html")
 	if err != nil {
 		return err
 	}
