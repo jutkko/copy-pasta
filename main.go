@@ -19,7 +19,6 @@ func main() {
 	// stdin is pipe
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		var input []string
-		fmt.Printf("Terminal: %#+v...\n", input)
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			input = append(input, scanner.Text())
@@ -28,13 +27,13 @@ func main() {
 		fmt.Printf("Storing: %#+v...\n", input)
 		client, err := minioClient()
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
 		}
 
 		bucketName, location := s3BucketInfo()
 		err = store.S3Write(client, bucketName, location, input)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
 	} else {
 		// stdin is tty
