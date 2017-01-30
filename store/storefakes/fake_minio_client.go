@@ -39,6 +39,16 @@ type FakeMinioClient struct {
 		result1 int64
 		result2 error
 	}
+	FGetObjectStub        func(string, string, string) error
+	fGetObjectMutex       sync.RWMutex
+	fGetObjectArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}
+	fGetObjectReturns struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -145,6 +155,40 @@ func (fake *FakeMinioClient) PutObjectReturns(result1 int64, result2 error) {
 	}{result1, result2}
 }
 
+func (fake *FakeMinioClient) FGetObject(arg1 string, arg2 string, arg3 string) error {
+	fake.fGetObjectMutex.Lock()
+	fake.fGetObjectArgsForCall = append(fake.fGetObjectArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+	}{arg1, arg2, arg3})
+	fake.recordInvocation("FGetObject", []interface{}{arg1, arg2, arg3})
+	fake.fGetObjectMutex.Unlock()
+	if fake.FGetObjectStub != nil {
+		return fake.FGetObjectStub(arg1, arg2, arg3)
+	}
+	return fake.fGetObjectReturns.result1
+}
+
+func (fake *FakeMinioClient) FGetObjectCallCount() int {
+	fake.fGetObjectMutex.RLock()
+	defer fake.fGetObjectMutex.RUnlock()
+	return len(fake.fGetObjectArgsForCall)
+}
+
+func (fake *FakeMinioClient) FGetObjectArgsForCall(i int) (string, string, string) {
+	fake.fGetObjectMutex.RLock()
+	defer fake.fGetObjectMutex.RUnlock()
+	return fake.fGetObjectArgsForCall[i].arg1, fake.fGetObjectArgsForCall[i].arg2, fake.fGetObjectArgsForCall[i].arg3
+}
+
+func (fake *FakeMinioClient) FGetObjectReturns(result1 error) {
+	fake.FGetObjectStub = nil
+	fake.fGetObjectReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakeMinioClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -154,6 +198,8 @@ func (fake *FakeMinioClient) Invocations() map[string][][]interface{} {
 	defer fake.bucketExistsMutex.RUnlock()
 	fake.putObjectMutex.RLock()
 	defer fake.putObjectMutex.RUnlock()
+	fake.fGetObjectMutex.RLock()
+	defer fake.fGetObjectMutex.RUnlock()
 	return fake.invocations
 }
 

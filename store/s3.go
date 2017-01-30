@@ -3,6 +3,9 @@ package store
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 //go:generate counterfeiter . MinioClient
@@ -11,6 +14,7 @@ type MinioClient interface {
 	MakeBucket(string, string) error
 	BucketExists(string) (bool, error)
 	PutObject(string, string, io.Reader, string) (int64, error)
+	FGetObject(string, string, string) error
 }
 
 func S3Write(client MinioClient, bucketName, location string, content []string) error {
@@ -33,6 +37,29 @@ func S3Write(client MinioClient, bucketName, location string, content []string) 
 	return nil
 }
 
-func S3Read() ([]string, error) {
-	return nil, nil
+func S3Read(client MinioClient, bucketName, objectName string) ([]string, error) {
+	tempFile, err := ioutil.TempFile("/tmp", "tempS3ObjectFile")
+	if err != nil {
+		return nil, err
+	}
+
+	defer tempFile.Close()
+	defer func() {
+		err = os.Remove(tempFile.Name())
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	err = client.FGetObject(bucketName, objectName, tempFile.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	byteContent, err := ioutil.ReadFile(tempFile.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	return []string{string(byteContent)}, nil
 }
