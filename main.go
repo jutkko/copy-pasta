@@ -16,18 +16,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+	client, err := minioClient()
+	if err != nil {
+		log.Fatalf(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+	}
+
 	// stdin is pipe
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		var input []string
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			input = append(input, scanner.Text())
-		}
-
-		fmt.Printf("Storing: %#+v...\n", input)
-		client, err := minioClient()
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
 		}
 
 		bucketName, location := s3BucketInfo()
@@ -38,6 +37,13 @@ func main() {
 	} else {
 		// stdin is tty
 		println("Getting the last copied item...")
+		bucketName, _ := s3BucketInfo()
+
+		content, err := store.S3Read(client, bucketName, "zhou-test-object-real-shit")
+		if err != nil {
+			log.Fatalf(fmt.Sprintf("Failed writing to read bucket: %s\n", err.Error()))
+		}
+		fmt.Printf("%#+v\n", content)
 	}
 }
 
@@ -47,7 +53,7 @@ func minioClient() (*minio.Client, error) {
 	secretAccessKey := os.Getenv("S3SECRETACCESSKEY")
 	useSSL := true
 
-	// Initialize minio client object.
+	// Initialize minio client object
 	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
 }
 
