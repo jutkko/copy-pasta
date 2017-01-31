@@ -5,14 +5,14 @@ To use, do the following setup on the two machiens you want to `copy-pasta`
 go get github.com/jutkko/copy-pasta
 ```
 
-Configure the `secret` file according to the `secret.example` file. To copy, on one machine you do:
+Configure the `secret` file according to the `secret.example` file. To copy, on one machine you do
 
 ```
 . secret # to source the environment variables
 echo "Pasta-copy" | copy-pasta
 ```
 
-On the other machine you do:
+On the other machine you do
 
 ```
 copy-pasta
@@ -27,7 +27,24 @@ Pasta-copy
 in your terminal.
 
 # To test
-TODO: lots to do!
+You will need to have a working go environment, and go to the repo
+
+```
+cd copy-pasta
+```
+
+Install the awesome ginkgo testing framework
+
+```
+go get github.com/onsi/ginkgo
+go get github.com/onsi/gomega
+```
+
+To run the tests
+
+```
+ginkgo -r
+```
 
 # To contribute
 TODO: lots to do!
