@@ -3,6 +3,7 @@ package store_test
 import (
 	"bytes"
 	"errors"
+	"io"
 	"io/ioutil"
 
 	"github.com/jutkko/copy-pasta/store"
@@ -14,11 +15,11 @@ import (
 var _ = Describe("S3", func() {
 	Describe("Write", func() {
 		var fakeClient *storefakes.FakeMinioClient
-		var exampleContent []string
+		var exampleContent io.Reader
 		var actualBucketName, actualObjectName, actualLoaction string
 
 		BeforeEach(func() {
-			exampleContent = []string{"He is a banana", "and an apple"}
+			exampleContent = bytes.NewReader([]byte("He is a banana\nand an apple"))
 			fakeClient = new(storefakes.FakeMinioClient)
 			actualBucketName = "this-bucket"
 			actualObjectName = "this-object"
@@ -58,7 +59,7 @@ var _ = Describe("S3", func() {
 				bucketName, objectName, reader, contentType := fakeClient.PutObjectArgsForCall(0)
 				Expect(bucketName).To(Equal(actualBucketName))
 				Expect(objectName).To(Equal(actualObjectName))
-				Expect(reader).To(Equal(bytes.NewReader([]byte("He is a banana"))))
+				Expect(reader).To(Equal(exampleContent))
 				Expect(contentType).To(Equal("text/html"))
 			})
 
@@ -103,7 +104,7 @@ var _ = Describe("S3", func() {
 				bucketName, objectName, reader, contentType := fakeClient.PutObjectArgsForCall(0)
 				Expect(bucketName).To(Equal(actualBucketName))
 				Expect(objectName).To(Equal(actualObjectName))
-				Expect(reader).To(Equal(bytes.NewReader([]byte("He is a banana"))))
+				Expect(reader).To(Equal(exampleContent))
 				Expect(contentType).To(Equal("text/html"))
 			})
 
@@ -131,17 +132,19 @@ var _ = Describe("S3", func() {
 	Describe("Read", func() {
 		var fakeClient *storefakes.FakeMinioClient
 		var actualBucketName, actualObjectName string
+		var actualContent []byte
 
 		BeforeEach(func() {
 			fakeClient = new(storefakes.FakeMinioClient)
 			actualBucketName = "read-bucket"
 			actualObjectName = "read-thing"
+			actualContent = []byte("Arrgggh!\nOooops")
 		})
 
 		It("should return the string", func() {
 			fakeClient.FGetObjectStub = func(bucketName, objectName, filePath string) error {
 				if bucketName == "read-bucket" && objectName == "read-thing" {
-					err := ioutil.WriteFile(filePath, []byte("Arrgggh!"), 0600)
+					err := ioutil.WriteFile(filePath, actualContent, 0600)
 					Expect(err).ToNot(HaveOccurred())
 				}
 				return nil
@@ -149,7 +152,7 @@ var _ = Describe("S3", func() {
 
 			content, err := store.S3Read(fakeClient, actualBucketName, actualObjectName)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(content).To(Equal([]string{"Arrgggh!"}))
+			Expect(content).To(Equal(string(actualContent)))
 		})
 
 		It("should not leave temp files around", func() {

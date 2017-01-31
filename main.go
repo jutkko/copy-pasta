@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -23,14 +22,8 @@ func main() {
 
 	// stdin is pipe
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
-		var input []string
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			input = append(input, scanner.Text())
-		}
-
 		bucketName, objectName, location := s3BucketInfo()
-		err = store.S3Write(client, bucketName, objectName, location, input)
+		err = store.S3Write(client, bucketName, objectName, location, os.Stdin)
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
@@ -43,7 +36,7 @@ func main() {
 		if err != nil {
 			log.Fatalf(fmt.Sprintf("Failed writing to read bucket: %s\n", err.Error()))
 		}
-		fmt.Printf("%#+v\n", content)
+		fmt.Printf("%s", content)
 	}
 }
 

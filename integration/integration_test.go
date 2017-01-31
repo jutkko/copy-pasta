@@ -5,10 +5,14 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 )
 
 var _ = Describe("Main", func() {
+	var writeContent []byte
+
+	BeforeEach(func() {
+		writeContent = []byte("HHHHHHHHHHey\nBye")
+	})
 
 	It("should run successfully with exit code 0", func() {
 		createCmd()
@@ -20,7 +24,7 @@ var _ = Describe("Main", func() {
 	It("should store the stdin and return the value next time I call the binary", func() {
 		createCmd()
 		stdinPipe := getStdinPipe()
-		_, err := stdinPipe.Write([]byte("HHHHHHHHHHey"))
+		_, err := stdinPipe.Write(writeContent)
 		Expect(err).ToNot(HaveOccurred())
 
 		session := runBinary()
@@ -33,7 +37,9 @@ var _ = Describe("Main", func() {
 		createCmd()
 		session = runBinary()
 		session.Wait(5 * time.Second)
-		Eventually(session.Out).Should(gbytes.Say("HHHHHHHHHHey"))
+
+		readString := string(session.Out.Contents())
+		Expect(readString).To(Equal(string(writeContent)))
 		Expect(session.ExitCode()).To(Equal(0))
 	})
 })

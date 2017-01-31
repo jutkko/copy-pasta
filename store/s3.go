@@ -1,7 +1,6 @@
 package store
 
 import (
-	"bytes"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,7 +16,7 @@ type MinioClient interface {
 	FGetObject(string, string, string) error
 }
 
-func S3Write(client MinioClient, bucketName, objectName, location string, content []string) error {
+func S3Write(client MinioClient, bucketName, objectName, location string, content io.Reader) error {
 	exists, err := client.BucketExists(bucketName)
 	if err != nil {
 		return err
@@ -30,17 +29,17 @@ func S3Write(client MinioClient, bucketName, objectName, location string, conten
 		}
 	}
 
-	_, err = client.PutObject(bucketName, objectName, bytes.NewReader([]byte(content[0])), "text/html")
+	_, err = client.PutObject(bucketName, objectName, content, "text/html")
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func S3Read(client MinioClient, bucketName, objectName string) ([]string, error) {
+func S3Read(client MinioClient, bucketName, objectName string) (string, error) {
 	tempFile, err := ioutil.TempFile("/tmp", "tempS3ObjectFile")
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	defer tempFile.Close()
@@ -53,13 +52,13 @@ func S3Read(client MinioClient, bucketName, objectName string) ([]string, error)
 
 	err = client.FGetObject(bucketName, objectName, tempFile.Name())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	byteContent, err := ioutil.ReadFile(tempFile.Name())
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return []string{string(byteContent)}, nil
+	return string(byteContent), nil
 }
