@@ -5,7 +5,7 @@ To use, do the following setup on the two machiens you want to `copy-pasta`
 go get github.com/jutkko/copy-pasta
 ```
 
-Configure the `secret` file according to the `secret.example` file, and to copy, on one machine you do:
+Configure the `secret` file according to the `secret.example` file. To copy, on one machine you do:
 
 ```
 . secret # to source the environment variables
