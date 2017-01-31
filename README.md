@@ -8,7 +8,7 @@ go get github.com/jutkko/copy-pasta
 Configure the `secret` file according to the `secret.example` file.
 
 ```
-. secret # to source the environment variables
+source secret # to source the environment variables
 ```
 
 ## Single lined stuff
