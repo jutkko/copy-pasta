@@ -67,3 +67,6 @@ ginkgo -r
 
 # To contribute
 TODO: lots to do!
+
+# copy-pasta?
+Credits to my colleague [Vlad](https://github.com/vlad-stoian). Genius!
