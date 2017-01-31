@@ -8,6 +8,7 @@ go get github.com/jutkko/copy-pasta
 Configure the `secret` file according to the `secret.example` file, and to copy, on one machine you do:
 
 ```
+. secret # to source the environment variables
 echo "Pasta-copy" | copy-pasta
 ```
 
