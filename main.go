@@ -51,8 +51,19 @@ func minioClient() (*minio.Client, error) {
 }
 
 func s3BucketInfo() (string, string, string) {
-	bucketName := os.Getenv("S3BUCKETNAME")
-	objectName := os.Getenv("S3OBJECTNAME")
-	location := os.Getenv("S3LOCATION")
+	var bucketName, objectName, location string
+
+	if bucketName = os.Getenv("S3BUCKETNAME"); bucketName == "" {
+		bucketName = "default-bucket-name"
+	}
+
+	if objectName = os.Getenv("S3OBJECTNAME"); objectName == "" {
+		objectName = "default-object-name"
+	}
+
+	if location = os.Getenv("S3LOCATION"); location == "" {
+		location = "eu-west-2"
+	}
+
 	return bucketName, objectName, location
 }
