@@ -1,38 +1,53 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
 
-	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store"
 	minio "github.com/minio/minio-go"
 )
 
 func main() {
+	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "login":
+			loginCommand.Parse(os.Args[2:])
+		default:
+			fmt.Printf("%s is not a valid command.\n", os.Args[1])
+			os.Exit(2)
+		}
+
+		if loginCommand.Parsed() {
+			fmt.Printf("Please enter key:\n")
+			fmt.Printf("Please enter secret key:\n")
+		}
+	}
+
 	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var profile *runcommands.Rc
+	// var profile *runcommands.Rc
 	if _, err := os.Stat(filepath.Join(usr.HomeDir, ".copy-pastarc")); os.IsNotExist(err) {
-		err := runcommands.Initialize()
-		if err != nil {
-			log.Fatal(err)
-		}
-		// fmt.Printf("Please input your S3 accesskey")
-		// fmt.Printf("Please input your S3 secret accesskey")
+		// err := runcommands.Initialize()
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		fmt.Printf("Please log in")
+		os.Exit(1)
 
 		// reader := bufio.NewReader(os.Stdin)
 		// fmt.Print("Enter text: ")
 		// text, _ := reader.ReadString('\n')
 		// fmt.Println(text)
-	} else {
-		profile, _ = runcommands.Load(filepath.Join(usr.HomeDir, ".copy-pastarc"))
 	}
 
 	stat, err := os.Stdin.Stat()
