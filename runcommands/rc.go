@@ -11,46 +11,59 @@ import (
 )
 
 type Target struct {
+	Name            string `yaml:"name"`
 	AccessKey       string `yaml:"accesskey"`
 	SecretAccessKey string `yaml:"secretaccesskey"`
 }
 
+type Config struct {
+	CurrentTarget *Target            `yaml:"currenttarget"`
+	Targets       map[string]*Target `yaml:"targets"`
+}
+
 func Update(target, accessKey, secretAccessKey string) error {
-	var targets map[string]*Target
+	var config *Config
 	var err error
 
-	targets, err = Load()
+	config, err = Load()
 	if err != nil {
-		targets = make(map[string]*Target)
+		config = &Config{
+			CurrentTarget: &Target{},
+			Targets:       make(map[string]*Target),
+		}
 	}
 
-	targets[target] = &Target{
+	currentTarget := &Target{
+		Name:            target,
 		AccessKey:       accessKey,
 		SecretAccessKey: secretAccessKey,
 	}
 
-	targetsContents, err := yaml.Marshal(&targets)
+	config.CurrentTarget = currentTarget
+	config.Targets[target] = currentTarget
+
+	configContents, err := yaml.Marshal(&config)
 	if err != nil {
 		// this err is not tested, but it should not happen either
 		return err
 	}
 
 	// TODO error case
-	ioutil.WriteFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"), targetsContents, 0666)
+	ioutil.WriteFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"), configContents, 0666)
 	return nil
 }
 
-func Load() (map[string]*Target, error) {
-	var targets map[string]*Target
+func Load() (*Config, error) {
+	var config *Config
 
 	byteContent, err := ioutil.ReadFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"))
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Unable to load the targets, please check if ~/.copy-pastarc exists %s", err.Error()))
 	}
-	err = yaml.Unmarshal(byteContent, &targets)
+	err = yaml.Unmarshal(byteContent, &config)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Parsing failed %s", err.Error()))
 	}
 
-	return targets, nil
+	return config, nil
 }

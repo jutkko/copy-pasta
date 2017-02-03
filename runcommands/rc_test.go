@@ -13,6 +13,14 @@ import (
 var _ = Describe("Rc", func() {
 	Describe("Load", func() {
 		var tmpDir, copyPastaRc string
+		BeforeEach(func() {
+			var err error
+			tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
+			Expect(err).ToNot(HaveOccurred())
+
+			os.Setenv("HOME", tmpDir)
+		})
+
 		Context("when the .copy-pastarc file does not exist", func() {
 			It("should return an error saying there is no copy-pastarc", func() {
 				_, err := runcommands.Load()
@@ -22,30 +30,33 @@ var _ = Describe("Rc", func() {
 
 		Context("when the .copy-pastarc file exists", func() {
 			BeforeEach(func() {
-				var err error
-				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
-				Expect(err).ToNot(HaveOccurred())
-
-				os.Setenv("HOME", tmpDir)
-
 				copyPastaRc = filepath.Join(userHomeDir(), ".copy-pastarc")
-				copyPastaRcContents := `some-target:
-  accesskey: some-key
-  secretaccesskey: some-secret-key
-another-target:
-  accesskey: another-key
-  secretaccesskey: another-secret-key`
+				copyPastaRcContents := `currenttarget:
+  name: mycurrenttarget
+  accesskey: current-key
+  secretaccesskey: current-secret-key
+targets:
+  some-target:
+    name: some-target
+    accesskey: some-key
+    secretaccesskey: some-secret-key
+  another-target:
+    name: another-target
+    accesskey: another-key
+    secretaccesskey: another-secret-key`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 			})
 
 			It("should load the target to the Rc struct", func() {
-				targets, err := runcommands.Load()
+				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(targets["some-target"].AccessKey).To(Equal("some-key"))
-				Expect(targets["some-target"].SecretAccessKey).To(Equal("some-secret-key"))
-				Expect(targets["another-target"].AccessKey).To(Equal("another-key"))
-				Expect(targets["another-target"].SecretAccessKey).To(Equal("another-secret-key"))
+				currentTarget := config.CurrentTarget
+				checkTarget(currentTarget, "mycurrenttarget", "current-key", "current-secret-key")
+
+				targets := config.Targets
+				checkTarget(targets["some-target"], "some-target", "some-key", "some-secret-key")
+				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key")
 			})
 		})
 
@@ -71,7 +82,7 @@ another-target:
 		})
 	})
 
-	FDescribe("Update", func() {
+	Describe("Update", func() {
 		var tmpDir, copyPastaRc string
 		BeforeEach(func() {
 			var err error
@@ -85,62 +96,92 @@ another-target:
 
 		Context("when there is a target file already", func() {
 			BeforeEach(func() {
-				copyPastaRcContents := `some-target:
+				copyPastaRcContents := `currenttarget:
+  name: some-target
   accesskey: some-key
-  secretaccesskey: some-secret-key`
+  secretaccesskey: some-secret-key
+targets:
+  some-target:
+    name: some-target
+    accesskey: some-key
+    secretaccesskey: some-secret-key`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 			})
 
-			It("updates the current .copy-pastarc", func() {
-				err := runcommands.Update("another-target", "another-accesskey", "another-secret-key")
+			It("updates the current .copy-pastarc and sets the current target to target", func() {
+				err := runcommands.Update("another-target", "another-key", "another-secret-key")
 				Expect(err).ToNot(HaveOccurred())
 
-				targets, err := runcommands.Load()
+				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
+
+				currentTarget := config.CurrentTarget
+				checkTarget(currentTarget, "another-target", "another-key", "another-secret-key")
+
+				targets := config.Targets
 				Expect(len(targets)).To(Equal(2))
-				Expect(targets["some-target"].AccessKey).To(Equal("some-key"))
-				Expect(targets["some-target"].SecretAccessKey).To(Equal("some-secret-key"))
-				Expect(targets["another-target"].AccessKey).To(Equal("another-accesskey"))
-				Expect(targets["another-target"].SecretAccessKey).To(Equal("another-secret-key"))
+				checkTarget(targets["some-target"], "some-target", "some-key", "some-secret-key")
+				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key")
 			})
 		})
 
 		Context("when there is a target file already but corrupted", func() {
 			BeforeEach(func() {
-				copyPastaRcContents := `some-target:
+				copyPastaRcContents := `currenttarget:
+  some-target:
 		accesskey: some-key
-  secretaccesskey: some-secret-key`
+	  secretaccesskey: some-secret-key
+targets:
+  some-target:
+    name: some-target
+    accesskey: some-key
+    secretaccesskey: some-secret-key`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 			})
 
 			It("creates a new .copy-pastarc", func() {
-				err := runcommands.Update("another-target", "another-accesskey", "another-secret-key")
+				err := runcommands.Update("another-target", "another-key", "another-secret-key")
 				Expect(err).ToNot(HaveOccurred())
 
-				targets, err := runcommands.Load()
+				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
+
+				currentTarget := config.CurrentTarget
+				checkTarget(currentTarget, "another-target", "another-key", "another-secret-key")
+
+				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				Expect(targets["another-target"].AccessKey).To(Equal("another-accesskey"))
-				Expect(targets["another-target"].SecretAccessKey).To(Equal("another-secret-key"))
+				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key")
+
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
 		})
 
 		Context("when there is no target to start with", func() {
 			It("should create a new .copy-pasta file with the passed in credentials", func() {
-				err := runcommands.Update("another-target", "another-accesskey", "another-secret-key")
+				err := runcommands.Update("some-target", "some-key", "some-secret-key")
 				Expect(err).ToNot(HaveOccurred())
 
-				targets, err := runcommands.Load()
+				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
+
+				currentTarget := config.CurrentTarget
+				checkTarget(currentTarget, "some-target", "some-key", "some-secret-key")
+
+				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				Expect(targets["another-target"].AccessKey).To(Equal("another-accesskey"))
-				Expect(targets["another-target"].SecretAccessKey).To(Equal("another-secret-key"))
+				checkTarget(targets["some-target"], "some-target", "some-key", "some-secret-key")
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
 		})
 	})
 })
+
+func checkTarget(t *runcommands.Target, name, accessKey, secretAccessKey string) {
+	Expect(t.Name).To(Equal(name))
+	Expect(t.AccessKey).To(Equal(accessKey))
+	Expect(t.SecretAccessKey).To(Equal(secretAccessKey))
+}
 
 func userHomeDir() string {
 	return os.Getenv("HOME")
