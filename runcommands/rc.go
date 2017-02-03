@@ -16,15 +16,24 @@ type Target struct {
 }
 
 func Update(target, accessKey, secretAccessKey string) error {
-	// TODO error case here
-	targets, _ := Load()
+	var targets map[string]*Target
+	var err error
+
+	targets, err = Load()
+	if err != nil {
+		targets = make(map[string]*Target)
+	}
+
 	targets[target] = &Target{
 		AccessKey:       accessKey,
 		SecretAccessKey: secretAccessKey,
 	}
 
-	// TODO error case here
-	targetsContents, _ := yaml.Marshal(&targets)
+	targetsContents, err := yaml.Marshal(&targets)
+	if err != nil {
+		// this err is not tested, but it should not happen either
+		return err
+	}
 
 	// TODO error case
 	ioutil.WriteFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"), targetsContents, 0666)
