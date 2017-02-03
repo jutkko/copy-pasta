@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -8,12 +9,14 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store"
 	minio "github.com/minio/minio-go"
 )
 
 func main() {
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
+	// loginTargetOption := loginCommand.String("target", "", "copy-pasta target name")
 
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
@@ -25,9 +28,21 @@ func main() {
 		}
 
 		if loginCommand.Parsed() {
+			var accessKey, secretAccessKey string
+
+			reader := bufio.NewReader(os.Stdin)
 			fmt.Printf("Please enter key:\n")
+			accessKey, _ = reader.ReadString('\n')
+			fmt.Print(accessKey)
+
 			fmt.Printf("Please enter secret key:\n")
+			secretAccessKey, _ = reader.ReadString('\n')
+			fmt.Print(secretAccessKey)
+
+			runcommands.Update(accessKey, secretAccessKey)
 		}
+
+		os.Exit(0)
 	}
 
 	usr, err := user.Current()

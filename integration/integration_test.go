@@ -48,7 +48,7 @@ var _ = Describe("Main", func() {
 		})
 
 		Context("when the .copy-pastarc is not present", func() {
-			PIt("say that the credentials are not there and fail", func() {
+			It("says that the credentials are not there and fail", func() {
 				createCmd()
 				writeContent = []byte("HHHHHHHHHHey\nBye\n")
 				stdinPipe := getStdinPipe()
@@ -73,7 +73,7 @@ var _ = Describe("Main", func() {
 				args = []string{"login"}
 			})
 
-			It("should prompt for credentials", func() {
+			FIt("should prompt for credentials", func() {
 				createCmd()
 				writeContent = []byte("HHHHHHHHHHey\nBye\n")
 				stdinPipe := getStdinPipe()
