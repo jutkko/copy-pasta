@@ -49,7 +49,7 @@ Boom! You should see a copy of `myFileOnMachine0` on your machine 1.
 You will need to have a working go environment, and go to the repo
 
 ```
-cd copy-pasta
+cd $GOPATH/src/github.com/jutkko/copy-pasta
 ```
 
 Install the awesome ginkgo testing framework
