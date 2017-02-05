@@ -90,7 +90,6 @@ targets:
 				session := runBinary()
 
 				Eventually(session.Out).Should(gbytes.Say("Please log in"))
-
 				session.Wait(5 * time.Second)
 				Expect(session.ExitCode()).ToNot(Equal(0))
 			})
@@ -137,7 +136,7 @@ targets:
 				args = []string{}
 				createCmd()
 				stdinPipe = getStdinPipe()
-				_, err = stdinPipe.Write(writeContent)
+				_, err = stdinPipe.Write([]byte("something"))
 				Expect(err).ToNot(HaveOccurred())
 
 				session = runBinary()
@@ -152,7 +151,7 @@ targets:
 				session.Wait(5 * time.Second)
 
 				readString := string(session.Out.Contents())
-				Expect(readString).To(Equal(string(writeContent)))
+				Expect(readString).To(Equal("something"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})
 		})
