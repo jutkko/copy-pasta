@@ -137,13 +137,12 @@ func parseCommands(config *runcommands.Config) {
 		secretAccessKeyWithNewline, _ := reader.ReadString('\n')
 		secretAccessKey = strings.Trim(secretAccessKeyWithNewline, "\n")
 
-		fmt.Printf("Log in information saved\n")
-
-		if *loginTargetOption == "" {
-			runcommands.Update(accessKey, accessKey, secretAccessKey, getBucketName(accessKey))
-		} else {
-			runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption))
+		err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption))
+		if err != nil {
+			log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
 		}
+
+		fmt.Printf("Log in information saved\n")
 	}
 
 	os.Exit(0)
