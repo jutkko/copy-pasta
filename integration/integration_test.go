@@ -196,7 +196,7 @@ targets:
 				args = []string{}
 				createCmd()
 				stdinPipe = getStdinPipe()
-				writeContent = []byte("Hi")
+				writeContent = []byte("Hi from targetOne")
 				_, err = stdinPipe.Write(writeContent)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -225,20 +225,12 @@ targets:
 
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 
-				// target as myTargetOne
-				args = []string{"target", "myTargetOne"}
-				createCmd()
-
-				session = runBinary()
-				session.Wait(5 * time.Second)
-
-				Expect(session.ExitCode()).To(Equal(0))
-
+				// implicitly targeted as myTargetTwo
 				// copy something into it
 				args = []string{}
 				createCmd()
 				stdinPipe = getStdinPipe()
-				writeContent = []byte("Bye")
+				writeContent = []byte("Hi from targetTwo")
 				_, err = stdinPipe.Write(writeContent)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -249,14 +241,16 @@ targets:
 				session.Wait(5 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
-				// get something out
+				// get hi from targetOne  out
+				args = []string{"target", "myTargetOne"}
 				createCmd()
+
 				session = runBinary()
 				session.Wait(5 * time.Second)
 
 				readString := string(session.Out.Contents())
 				// wrong test, should say hi
-				Expect(readString).To(Equal("Bye"))
+				Expect(readString).To(Equal("Hi from targetOne"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})
 		})

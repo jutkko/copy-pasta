@@ -127,19 +127,19 @@ func parseCommands(targetP *string) {
 		secretAccessKeyWithNewline, _ := reader.ReadString('\n')
 		secretAccessKey = strings.Trim(secretAccessKeyWithNewline, "\n")
 
-		fmt.Printf("Log in information saved")
+		fmt.Printf("Log in information saved\n")
 
 		if *loginTargetOption == "" {
 			runcommands.Update(accessKey, accessKey, secretAccessKey, getRandomPasta(accessKey))
 		} else {
-			runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getRandomPasta(accessKey))
+			runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getRandomPasta(accessKey+*loginTargetOption))
 		}
 	}
 
 	os.Exit(0)
 }
 
-func getRandomPasta(accessKey string) string {
+func getRandomPasta(salt string) string {
 	pastas := []string{
 		"acinidipepe",
 		"agnolotti",
@@ -215,8 +215,8 @@ func getRandomPasta(accessKey string) string {
 		"vermicelli",
 	}
 
-	suffix := md5.Sum([]byte(accessKey))
-	randomIndex := int(suffix[0]) % len(pastas)
+	suffix := md5.Sum([]byte(salt))
+	pastaIndex := int(suffix[0]) % len(pastas)
 
-	return fmt.Sprintf("%s-%s", pastas[randomIndex], hex.EncodeToString(suffix[:]))
+	return fmt.Sprintf("%s-%s", pastas[pastaIndex], hex.EncodeToString(suffix[:]))
 }
