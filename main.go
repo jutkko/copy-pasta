@@ -140,16 +140,16 @@ func parseCommands(config *runcommands.Config) {
 		fmt.Printf("Log in information saved\n")
 
 		if *loginTargetOption == "" {
-			runcommands.Update(accessKey, accessKey, secretAccessKey, getRandomPasta(accessKey))
+			runcommands.Update(accessKey, accessKey, secretAccessKey, getBucketName(accessKey))
 		} else {
-			runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getRandomPasta(accessKey+*loginTargetOption))
+			runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption))
 		}
 	}
 
 	os.Exit(0)
 }
 
-func getRandomPasta(salt string) string {
+func getBucketName(salt string) string {
 	pastas := []string{
 		"acinidipepe",
 		"agnolotti",
