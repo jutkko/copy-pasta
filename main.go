@@ -27,7 +27,7 @@ func main() {
 
 	config, err := runcommands.Load()
 	if err != nil {
-		fmt.Printf("Please log in")
+		fmt.Printf("Please log in\n")
 		os.Exit(1)
 	}
 
