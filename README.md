@@ -45,7 +45,7 @@ On the other machine you do
 copy-pasta > myPenne.jpg
 ```
 
-Boom! You should see a copy of `myPenne.jpg` on your machine 1.
+Boom! You should see a copy of `myPenne.jpg` on your other machine.
 
 # Multi-user
 Are you sharing a machine with others? Or you want to have multiple clipboards?
