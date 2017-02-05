@@ -89,7 +89,39 @@ ginkgo -r
 ```
 
 # To contribute
-Please open an issue and talk about the feature/bug you have, I will get back to you very soon.
+## Features, concerns or bugs
+Please open an issue and talk about the feature/bug you have, I will get back
+to you very soon.
+
+## Use cases
+Got an interesting use case for `copy-pasta`? Make a PR and I will include it
+here! Here's some
+
+### Bash
+Non-interactive logon
+
+```
+printf "%s\n%s\n" "$ACESSKEY" "$SECRETACCESSKEY" | copy-pasta login --target my-target
+```
+
+Paste straight to pbcopy
+```
+#!/bin/bash
+copy-pasta-to-pbcopy() {
+  copy-pasta | pbcopy
+}
+```
+
+Copy straight into copy-paste
+
+```
+#!/bin/bash
+pbpaste-to-copy-pasta() {
+  pbpaste | copy-pasta
+}
+```
+
+... And yours?
 
 # copy-pasta?
 Credits to my colleague [Vlad](https://github.com/vlad-stoian). Genius!
