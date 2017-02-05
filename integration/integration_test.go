@@ -241,7 +241,7 @@ targets:
 				session.Wait(5 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
-				// get hi from targetOne  out
+				// set target
 				args = []string{"target", "myTargetOne"}
 				createCmd()
 
@@ -249,7 +249,17 @@ targets:
 				session.Wait(5 * time.Second)
 
 				readString := string(session.Out.Contents())
-				// wrong test, should say hi
+				Expect(readString).To(BeEmpty())
+				Expect(session.ExitCode()).To(Equal(0))
+
+				// get hi from targetOne  out
+				args = []string{}
+				createCmd()
+
+				session = runBinary()
+				session.Wait(5 * time.Second)
+
+				readString = string(session.Out.Contents())
 				Expect(readString).To(Equal("Hi from targetOne"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})

@@ -16,32 +16,15 @@ import (
 )
 
 func main() {
-	var targetName string
 	var target *runcommands.Target
-	var ok bool
 	var client *minio.Client
+	var err error
+	config := &runcommands.Config{}
 
-	if len(os.Args) > 1 {
-		parseCommands(&targetName)
-	}
+	parseCommands(config)
 
-	config, err := runcommands.Load()
-	if err != nil {
-		fmt.Printf("Please log in\n")
-		os.Exit(1)
-	}
-
-	if target, ok = config.Targets[targetName]; ok {
-		runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName)
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
-		}
-
-		client, err = minioClient(target)
-	} else {
-		client, err = minioClient(config.CurrentTarget)
-		target = config.CurrentTarget
-	}
+	target = config.CurrentTarget
+	client, err = minioClient(config.CurrentTarget)
 
 	if err != nil {
 		log.Fatalf(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
@@ -97,7 +80,18 @@ func s3BucketInfo(target *runcommands.Target) (string, string, string) {
 	return bucketName, objectName, location
 }
 
-func parseCommands(targetP *string) {
+func parseCommands(config *runcommands.Config) {
+	if len(os.Args) == 1 {
+		configTemp, err := runcommands.Load()
+		if err != nil {
+			fmt.Printf("Please log in\n")
+			os.Exit(1)
+		}
+		*config = *configTemp
+
+		return
+	}
+
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
 	loginTargetOption := loginCommand.String("target", "", "the name for copy-pasta's target")
 
@@ -106,7 +100,23 @@ func parseCommands(targetP *string) {
 		loginCommand.Parse(os.Args[2:])
 	case "target":
 		if len(os.Args) > 2 {
-			*targetP = os.Args[2]
+			configTemp, err := runcommands.Load()
+			if err != nil {
+				fmt.Printf("Please log in\n")
+				os.Exit(1)
+			}
+			*config = *configTemp
+
+			if target, ok := config.Targets[os.Args[2]]; ok {
+				err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName)
+				if err != nil {
+					log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
+				}
+			} else {
+				fmt.Printf("Target invalid\n")
+				os.Exit(3)
+			}
+			os.Exit(0)
 		}
 		return
 	default:
