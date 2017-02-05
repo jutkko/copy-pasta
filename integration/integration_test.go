@@ -155,6 +155,112 @@ targets:
 			})
 		})
 
+		Context("target", func() {
+			var tmpDir string
+			var err error
+			BeforeEach(func() {
+				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
+				Expect(err).ToNot(HaveOccurred())
+
+				os.Setenv("HOME", tmpDir)
+				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
+				os.Setenv("S3LOCATION", "us-east-1")
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tmpDir)).To(Succeed())
+			})
+
+			// this example uses the test minio endpoint
+			FIt("should prompt for credentials and next time it should work", func() {
+				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-one")
+				args = []string{"login", "--target", "myTargetOne"}
+				createCmd()
+				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
+				stdinPipe := getStdinPipe()
+				_, err := stdinPipe.Write(loginWriteContent)
+				Expect(err).ToNot(HaveOccurred())
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				session := runBinary()
+
+				Eventually(session.Out).Should(gbytes.Say("Please enter key"))
+				Eventually(session.Out).Should(gbytes.Say("Please enter secret key"))
+				Eventually(session.Out).Should(gbytes.Say("Log in information saved"))
+
+				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
+
+				// copy something into it
+				args = []string{}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				writeContent = []byte("Hi")
+				_, err = stdinPipe.Write(writeContent)
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+				session.Wait(5 * time.Second)
+				Expect(session.ExitCode()).To(Equal(0))
+
+				// login as another target
+				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-two")
+				args = []string{"login", "--target", "myTargetTwo"}
+				createCmd()
+				loginWriteContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
+				stdinPipe = getStdinPipe()
+				_, err = stdinPipe.Write(loginWriteContent)
+				Expect(err).ToNot(HaveOccurred())
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+
+				Eventually(session.Out).Should(gbytes.Say("Please enter key"))
+				Eventually(session.Out).Should(gbytes.Say("Please enter secret key"))
+				Eventually(session.Out).Should(gbytes.Say("Log in information saved"))
+
+				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
+
+				// target as myTargetOne
+				args = []string{"target", "myTargetOne"}
+				createCmd()
+
+				session = runBinary()
+				session.Wait(5 * time.Second)
+
+				Expect(session.ExitCode()).To(Equal(0))
+
+				// copy something into it
+				args = []string{}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				writeContent = []byte("Bye")
+				_, err = stdinPipe.Write(writeContent)
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+				session.Wait(5 * time.Second)
+				Expect(session.ExitCode()).To(Equal(0))
+
+				// get something out
+				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-one")
+				createCmd()
+				session = runBinary()
+				session.Wait(5 * time.Second)
+
+				readString := string(session.Out.Contents())
+				Expect(readString).To(Equal("Hi"))
+				Expect(session.ExitCode()).To(Equal(0))
+			})
+		})
+
 		Context("something invalid", func() {
 			It("should inform that the command is not valid", func() {
 				args = []string{"ligon", "--target", "myTarget"}
