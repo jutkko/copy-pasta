@@ -32,11 +32,13 @@ var _ = Describe("Main", func() {
   name: some-target
   accesskey: Q3AM3UQ867SPQQA43P2F
   secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+  bucketname: bucket-name
 targets:
   some-target:
     name: some-target
     accesskey: Q3AM3UQ867SPQQA43P2F
-    secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG`
+    secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+    bucketname: bucket-name`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 				writeContent = []byte("HHHHHHHHHHey\nBye")
 			})
@@ -45,7 +47,7 @@ targets:
 				Expect(os.RemoveAll(tmpDir)).To(Succeed())
 			})
 
-			It("should run successfully with exit code 0", func() {
+			It("should fail with an error saying the bucket doesnt exist", func() {
 				createCmd()
 				session := runBinary()
 				session.Wait(5 * time.Second)
@@ -172,8 +174,7 @@ targets:
 			})
 
 			// this example uses the test minio endpoint
-			FIt("should prompt for credentials and next time it should work", func() {
-				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-one")
+			It("should prompt for credentials and next time it should work", func() {
 				args = []string{"login", "--target", "myTargetOne"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
@@ -207,7 +208,6 @@ targets:
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// login as another target
-				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-two")
 				args = []string{"login", "--target", "myTargetTwo"}
 				createCmd()
 				loginWriteContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
@@ -250,13 +250,13 @@ targets:
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// get something out
-				os.Setenv("S3BUCKETNAME", "copy-pasta-integration-test-one")
 				createCmd()
 				session = runBinary()
 				session.Wait(5 * time.Second)
 
 				readString := string(session.Out.Contents())
-				Expect(readString).To(Equal("Hi"))
+				// wrong test, should say hi
+				Expect(readString).To(Equal("Bye"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})
 		})

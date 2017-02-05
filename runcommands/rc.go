@@ -14,6 +14,7 @@ type Target struct {
 	Name            string `yaml:"name"`
 	AccessKey       string `yaml:"accesskey"`
 	SecretAccessKey string `yaml:"secretaccesskey"`
+	BucketName      string `yaml:"bucketname"`
 }
 
 type Config struct {
@@ -21,7 +22,7 @@ type Config struct {
 	Targets       map[string]*Target `yaml:"targets"`
 }
 
-func Update(target, accessKey, secretAccessKey string) error {
+func Update(target, accessKey, secretAccessKey, bucketName string) error {
 	var config *Config
 	var err error
 
@@ -37,6 +38,7 @@ func Update(target, accessKey, secretAccessKey string) error {
 		Name:            target,
 		AccessKey:       accessKey,
 		SecretAccessKey: secretAccessKey,
+		BucketName:      bucketName,
 	}
 
 	config.CurrentTarget = currentTarget
