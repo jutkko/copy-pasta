@@ -113,12 +113,14 @@ func parseCommands(config *runcommands.Config) {
 					log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
 				}
 			} else {
-				fmt.Printf("Target invalid\n")
+				fmt.Printf("Target is invalid\n")
 				os.Exit(3)
 			}
 			os.Exit(0)
 		}
-		return
+
+		fmt.Printf("No target provided\n")
+		os.Exit(4)
 	default:
 		fmt.Printf("%s is not a valid command.\n", os.Args[1])
 		os.Exit(2)

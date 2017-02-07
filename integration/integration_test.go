@@ -262,6 +262,18 @@ targets:
 				Expect(readString).To(Equal("Hi from targetOne"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})
+
+			Context("when there is no target", func() {
+				It("should should fail", func() {
+					args = []string{"target"}
+					createCmd()
+					session := runBinary()
+					Eventually(session.Out).Should(gbytes.Say("No target provided"))
+
+					session.Wait(5 * time.Second)
+					Expect(session.ExitCode()).ToNot(Equal(0))
+				})
+			})
 		})
 
 		Context("something invalid", func() {
