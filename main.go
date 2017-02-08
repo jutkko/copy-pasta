@@ -15,6 +15,81 @@ import (
 	minio "github.com/minio/minio-go"
 )
 
+var pastas = []string{
+	"acinidipepe",
+	"agnolotti",
+	"alphabetpasta",
+	"anelli",
+	"anellini",
+	"bigoli",
+	"bucatini",
+	"calamarata",
+	"campanelle",
+	"cannelloni",
+	"capellini",
+	"casarecce",
+	"casoncelli",
+	"casunziei",
+	"cavatappi",
+	"cavatelli",
+	"cencioni",
+	"conchiglie",
+	"corzetti",
+	"croxetti",
+	"ditalini",
+	"fagottini",
+	"farfalle",
+	"fettuccine",
+	"fiori",
+	"fogliedulivo",
+	"fregula",
+	"fusi",
+	"fusilli",
+	"garganelli",
+	"gemelli",
+	"lanterne",
+	"lasagne",
+	"lasagnette",
+	"linguettine",
+	"linguine",
+	"macaroni",
+	"mafalde",
+	"mafaldine",
+	"mezzelune",
+	"occhidilupo",
+	"orecchiette",
+	"orzo",
+	"pappardelle",
+	"passatelli",
+	"pastina",
+	"penne",
+	"pici",
+	"pillus",
+	"pizzoccheri",
+	"radiatori",
+	"ravioli",
+	"rigatoni",
+	"rotelle",
+	"rotini",
+	"sacchettoni",
+	"sagnarelli",
+	"scialatelli",
+	"spaghetti",
+	"stringozzi",
+	"strozzapreti",
+	"tagliatelle",
+	"taglierini",
+	"testaroli",
+	"tortellini",
+	"tortelli",
+	"tortelloni",
+	"trenette",
+	"tripoline",
+	"troccoli",
+	"trofie",
+	"vermicelli",
+}
+
 func main() {
 	var target *runcommands.Target
 	var client *minio.Client
@@ -34,6 +109,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// stdin is pipe
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		bucketName, objectName, location := s3BucketInfo(target)
@@ -98,35 +174,6 @@ func parseCommands(config *runcommands.Config) {
 	switch os.Args[1] {
 	case "login":
 		loginCommand.Parse(os.Args[2:])
-	case "target":
-		if len(os.Args) > 2 {
-			configTemp, err := runcommands.Load()
-			if err != nil {
-				fmt.Printf("Please log in\n")
-				os.Exit(1)
-			}
-			*config = *configTemp
-
-			if target, ok := config.Targets[os.Args[2]]; ok {
-				err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName)
-				if err != nil {
-					log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
-				}
-			} else {
-				fmt.Printf("Target is invalid\n")
-				os.Exit(3)
-			}
-			os.Exit(0)
-		}
-
-		fmt.Printf("No target provided\n")
-		os.Exit(4)
-	default:
-		fmt.Printf("%s is not a valid command.\n", os.Args[1])
-		os.Exit(2)
-	}
-
-	if loginCommand.Parsed() {
 		var accessKey, secretAccessKey string
 
 		reader := bufio.NewReader(os.Stdin)
@@ -145,87 +192,48 @@ func parseCommands(config *runcommands.Config) {
 		}
 
 		fmt.Printf("Log in information saved\n")
+	case "target":
+		if len(os.Args) > 2 {
+			configTemp, err := runcommands.Load()
+			if err != nil {
+				fmt.Printf("Please log in\n")
+				os.Exit(1)
+			}
+			*config = *configTemp
+
+			if target, ok := config.Targets[os.Args[2]]; ok {
+				err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName)
+				if err != nil {
+					log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
+				}
+			} else {
+				fmt.Printf("Target is invalid\n")
+				os.Exit(3)
+			}
+		} else {
+			fmt.Printf("No target provided\n")
+			os.Exit(4)
+		}
+	case "targets":
+		config, err := runcommands.Load()
+		if err != nil {
+			fmt.Printf("Please log in\n")
+			os.Exit(1)
+		}
+
+		fmt.Printf("copy-pasta targets:\n\n")
+		for _, target := range config.Targets {
+			fmt.Printf("  %s\n", target.Name)
+		}
+	default:
+		fmt.Printf("%s is not a valid command.\n", os.Args[1])
+		os.Exit(2)
 	}
 
 	os.Exit(0)
 }
 
 func getBucketName(salt string) string {
-	pastas := []string{
-		"acinidipepe",
-		"agnolotti",
-		"alphabetpasta",
-		"anelli",
-		"anellini",
-		"bigoli",
-		"bucatini",
-		"calamarata",
-		"campanelle",
-		"cannelloni",
-		"capellini",
-		"casarecce",
-		"casoncelli",
-		"casunziei",
-		"cavatappi",
-		"cavatelli",
-		"cencioni",
-		"conchiglie",
-		"corzetti",
-		"croxetti",
-		"ditalini",
-		"fagottini",
-		"farfalle",
-		"fettuccine",
-		"fiori",
-		"fogliedulivo",
-		"fregula",
-		"fusi",
-		"fusilli",
-		"garganelli",
-		"gemelli",
-		"lanterne",
-		"lasagne",
-		"lasagnette",
-		"linguettine",
-		"linguine",
-		"macaroni",
-		"mafalde",
-		"mafaldine",
-		"mezzelune",
-		"occhidilupo",
-		"orecchiette",
-		"orzo",
-		"pappardelle",
-		"passatelli",
-		"pastina",
-		"penne",
-		"pici",
-		"pillus",
-		"pizzoccheri",
-		"radiatori",
-		"ravioli",
-		"rigatoni",
-		"rotelle",
-		"rotini",
-		"sacchettoni",
-		"sagnarelli",
-		"scialatelli",
-		"spaghetti",
-		"stringozzi",
-		"strozzapreti",
-		"tagliatelle",
-		"taglierini",
-		"testaroli",
-		"tortellini",
-		"tortelli",
-		"tortelloni",
-		"trenette",
-		"tripoline",
-		"troccoli",
-		"trofie",
-		"vermicelli",
-	}
-
 	suffix := md5.Sum([]byte(salt))
 	pastaIndex := int(suffix[0]) % len(pastas)
 
