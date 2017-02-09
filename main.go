@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -14,6 +15,15 @@ import (
 	"github.com/jutkko/copy-pasta/store"
 	minio "github.com/minio/minio-go"
 )
+
+type InvalidConfig struct {
+	error  string
+	status int
+}
+
+func (ic *InvalidConfig) Error() string {
+	return ic.error
+}
 
 var pastas = []string{
 	"acinidipepe",
@@ -91,42 +101,47 @@ var pastas = []string{
 }
 
 func main() {
-	var target *runcommands.Target
-	var client *minio.Client
-	var err error
-	config := &runcommands.Config{}
-
-	parseCommands(config)
-
-	target = config.CurrentTarget
-	client, err = minioClient(config.CurrentTarget)
-
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+	config, invalidConfig := parseCommands()
+	if invalidConfig != nil {
+		fmt.Println(invalidConfig)
+		os.Exit(invalidConfig.status)
 	}
 
+	if config != nil {
+		if err := copyPaste(config.CurrentTarget); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func copyPaste(target *runcommands.Target) error {
+	client, err := minioClient(target)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+	}
+
+	bucketName, objectName, location := s3BucketInfo(target)
+	if isFromAPipe() {
+		if err = store.S3Write(client, bucketName, objectName, location, os.Stdin); err != nil {
+			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
+		}
+	} else {
+		content, err := store.S3Read(client, bucketName, objectName)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
+		}
+		fmt.Print(content)
+	}
+	return nil
+}
+
+func isFromAPipe() bool {
 	stat, err := os.Stdin.Stat()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// stdin is pipe
-	if (stat.Mode() & os.ModeCharDevice) == 0 {
-		bucketName, objectName, location := s3BucketInfo(target)
-		err = store.S3Write(client, bucketName, objectName, location, os.Stdin)
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
-		}
-	} else {
-		// stdin is tty
-		bucketName, objectName, _ := s3BucketInfo(target)
-
-		content, err := store.S3Read(client, bucketName, objectName)
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
-		}
-		fmt.Printf("%s", content)
-	}
+	return (stat.Mode() & os.ModeCharDevice) == 0
 }
 
 func minioClient(t *runcommands.Target) (*minio.Client, error) {
@@ -142,30 +157,44 @@ func minioClient(t *runcommands.Target) (*minio.Client, error) {
 	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
 }
 
-func s3BucketInfo(target *runcommands.Target) (string, string, string) {
-	var bucketName, objectName, location string
-
-	bucketName = target.BucketName
-	if objectName = os.Getenv("S3OBJECTNAME"); objectName == "" {
-		objectName = "default-object-name"
+func getOrElse(key, defaultValue string) string {
+	result := os.Getenv(key)
+	if result == "" {
+		return defaultValue
 	}
-	if location = os.Getenv("S3LOCATION"); location == "" {
-		location = "eu-west-2"
-	}
-
-	return bucketName, objectName, location
+	return result
 }
 
-func parseCommands(config *runcommands.Config) {
-	if len(os.Args) == 1 {
-		configTemp, err := runcommands.Load()
-		if err != nil {
-			fmt.Printf("Please log in\n")
-			os.Exit(1)
-		}
-		*config = *configTemp
+func s3BucketInfo(target *runcommands.Target) (string, string, string) {
+	return target.BucketName,
+		getOrElse("S3OBJECTNAME", "default-object-name"),
+		getOrElse("S3LOCATION", "eu-west-2")
+}
 
-		return
+func loadRunCommands() (*runcommands.Config, *InvalidConfig) {
+	loadedConfig, err := runcommands.Load()
+	if err != nil {
+		return nil, &InvalidConfig{
+			error:  "Please log in",
+			status: 1,
+		}
+	}
+	return loadedConfig, nil
+}
+
+func prompt(message string, reader *bufio.Reader) (string, error) {
+	fmt.Print(message)
+	resultWithNewLine, err := reader.ReadString('\n')
+	// TODO test this?
+	if err != nil {
+		return "", err
+	}
+	return strings.Trim(resultWithNewLine, "\n"), nil
+
+}
+func parseCommands() (*runcommands.Config, *InvalidConfig) {
+	if len(os.Args) == 1 {
+		return loadRunCommands()
 	}
 
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
@@ -174,63 +203,63 @@ func parseCommands(config *runcommands.Config) {
 	switch os.Args[1] {
 	case "login":
 		loginCommand.Parse(os.Args[2:])
-		var accessKey, secretAccessKey string
 
 		reader := bufio.NewReader(os.Stdin)
+		accessKey, _ := prompt("Please enter key: ", reader)
+		secretAccessKey, _ := prompt("Please enter secret key: ", reader)
 
-		fmt.Printf("Please enter key:\n")
-		accessKeyWithNewline, _ := reader.ReadString('\n')
-		accessKey = strings.Trim(accessKeyWithNewline, "\n")
-
-		fmt.Printf("Please enter secret key:\n")
-		secretAccessKeyWithNewline, _ := reader.ReadString('\n')
-		secretAccessKey = strings.Trim(secretAccessKeyWithNewline, "\n")
-
-		err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption))
-		if err != nil {
-			log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
+		if err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption)); err != nil {
+			return nil, &InvalidConfig{
+				error:  fmt.Sprintf("Failed to update the current target: %s\n", err.Error()),
+				status: 1,
+			}
 		}
 
-		fmt.Printf("Log in information saved\n")
+		fmt.Println("Log in information saved")
 	case "target":
 		if len(os.Args) > 2 {
-			configTemp, err := runcommands.Load()
+			config, err := loadRunCommands()
 			if err != nil {
-				fmt.Printf("Please log in\n")
-				os.Exit(1)
+				return nil, err
 			}
-			*config = *configTemp
 
 			if target, ok := config.Targets[os.Args[2]]; ok {
-				err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName)
-				if err != nil {
-					log.Fatalf(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
+				if err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName); err != nil {
+					return nil, &InvalidConfig{
+						error:  fmt.Sprintf("Failed to update the current target: %s", err.Error()),
+						status: 1,
+					}
 				}
 			} else {
-				fmt.Printf("Target is invalid\n")
-				os.Exit(3)
+				return nil, &InvalidConfig{
+					error:  "Target is invalid",
+					status: 3,
+				}
 			}
 		} else {
-			fmt.Printf("No target provided\n")
-			os.Exit(4)
+			return nil, &InvalidConfig{
+				error:  "No target provided",
+				status: 4,
+			}
 		}
 	case "targets":
-		config, err := runcommands.Load()
+		config, err := loadRunCommands()
 		if err != nil {
-			fmt.Printf("Please log in\n")
-			os.Exit(1)
+			return nil, err
 		}
 
-		fmt.Printf("copy-pasta targets:\n\n")
+		fmt.Println("copy-pasta targets:")
 		for _, target := range config.Targets {
 			fmt.Printf("  %s\n", target.Name)
 		}
 	default:
-		fmt.Printf("%s is not a valid command.\n", os.Args[1])
-		os.Exit(2)
+		return nil, &InvalidConfig{
+			error:  fmt.Sprintf("%s is not a valid command.\n", os.Args[1]),
+			status: 2,
+		}
 	}
 
-	os.Exit(0)
+	return nil, nil
 }
 
 func getBucketName(salt string) string {
