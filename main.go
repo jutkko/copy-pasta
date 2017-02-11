@@ -190,8 +190,8 @@ func prompt(message string, reader *bufio.Reader) (string, error) {
 		return "", err
 	}
 	return strings.Trim(resultWithNewLine, "\n"), nil
-
 }
+
 func parseCommands() (*runcommands.Config, *InvalidConfig) {
 	if len(os.Args) == 1 {
 		return loadRunCommands()
