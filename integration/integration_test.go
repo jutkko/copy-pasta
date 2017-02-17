@@ -47,13 +47,6 @@ targets:
 				Expect(os.RemoveAll(tmpDir)).To(Succeed())
 			})
 
-			It("should fail with an error saying the bucket doesnt exist", func() {
-				createCmd()
-				session := runBinary()
-				session.Wait(5 * time.Second)
-				Expect(session.ExitCode()).To(Equal(0))
-			})
-
 			It("should store the stdin and return the value next time I call the binary", func() {
 				createCmd()
 				stdinPipe := getStdinPipe()
@@ -64,12 +57,12 @@ targets:
 
 				err = stdinPipe.Close()
 				Expect(err).ToNot(HaveOccurred())
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
 				createCmd()
 				session = runBinary()
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 
 				readString := string(session.Out.Contents())
 				Expect(readString).To(Equal(string(writeContent)))
@@ -90,7 +83,7 @@ targets:
 				session := runBinary()
 
 				Eventually(session.Out).Should(gbytes.Say("Please log in"))
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).ToNot(Equal(0))
 			})
 		})
@@ -143,12 +136,12 @@ targets:
 
 				err = stdinPipe.Close()
 				Expect(err).ToNot(HaveOccurred())
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
 				createCmd()
 				session = runBinary()
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 
 				readString := string(session.Out.Contents())
 				Expect(readString).To(Equal("something"))
@@ -203,7 +196,7 @@ targets:
 
 				err = stdinPipe.Close()
 				Expect(err).ToNot(HaveOccurred())
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// login as another target
@@ -237,7 +230,7 @@ targets:
 
 				err = stdinPipe.Close()
 				Expect(err).ToNot(HaveOccurred())
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// set target
@@ -245,7 +238,7 @@ targets:
 				createCmd()
 
 				session = runBinary()
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 
 				readString := string(session.Out.Contents())
 				Expect(readString).To(BeEmpty())
@@ -256,7 +249,7 @@ targets:
 				createCmd()
 
 				session = runBinary()
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 
 				readString = string(session.Out.Contents())
 				Expect(readString).To(Equal("Hi from targetOne"))
@@ -270,7 +263,7 @@ targets:
 					session := runBinary()
 					Eventually(session.Out).Should(gbytes.Say("No target provided"))
 
-					session.Wait(5 * time.Second)
+					session.Wait(10 * time.Second)
 					Expect(session.ExitCode()).ToNot(Equal(0))
 				})
 			})
@@ -287,7 +280,7 @@ targets:
 					Expect(err).ToNot(HaveOccurred())
 
 					session := runBinary()
-					session.Wait(5 * time.Second)
+					session.Wait(10 * time.Second)
 
 					Expect(session.ExitCode()).To(Equal(0))
 					Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
@@ -301,7 +294,7 @@ targets:
 					Expect(err).ToNot(HaveOccurred())
 
 					session = runBinary()
-					session.Wait(5 * time.Second)
+					session.Wait(10 * time.Second)
 
 					Expect(session.ExitCode()).To(Equal(0))
 					Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
@@ -315,7 +308,7 @@ targets:
 					session = runBinary()
 					err = stdinPipe.Close()
 					Expect(err).ToNot(HaveOccurred())
-					session.Wait(5 * time.Second)
+					session.Wait(10 * time.Second)
 
 					Expect(session.ExitCode()).To(Equal(0))
 
@@ -339,7 +332,7 @@ targets:
 				session := runBinary()
 				Eventually(session.Out).Should(gbytes.Say("ligon is not a valid command"))
 
-				session.Wait(5 * time.Second)
+				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).ToNot(Equal(0))
 			})
 		})
