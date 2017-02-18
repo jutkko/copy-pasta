@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/jutkko/copy-pasta",
-	"GoVersion": "go1.7",
-	"GodepVersion": "v78",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/minio/minio-go",
@@ -27,6 +27,10 @@
 			"ImportPath": "github.com/minio/minio-go/pkg/set",
 			"Comment": "v2.0.3-6-g83ba3bc",
 			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "4c78c975fe7c825c6d1466c42be594d1d6f3aba6"
 		}
 	]
 }
