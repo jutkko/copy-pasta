@@ -12,6 +12,7 @@ func main() {
 	ui := &cli.BasicUi{Writer: os.Stdout}
 
 	c := cli.NewCLI("copy-pasta", "0.0.1")
+	// no copy-pasta is passed down
 	c.Args = os.Args[1:]
 	c.Commands = map[string]cli.CommandFactory{
 		"": func() (cli.Command, error) {

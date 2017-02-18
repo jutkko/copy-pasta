@@ -23,7 +23,7 @@ func (ic *InvalidConfig) Error() string {
 type CopyPasteCommand struct{}
 
 func (c *CopyPasteCommand) Help() string {
-	return "hep is here and it is long"
+	return "Use echo $something | copy-pasta to copy and copy-pasta to paste"
 }
 
 func (c *CopyPasteCommand) Run(args []string) int {
@@ -44,7 +44,7 @@ func (c *CopyPasteCommand) Run(args []string) int {
 }
 
 func (c *CopyPasteCommand) Synopsis() string {
-	return "Provides debugging information for operators"
+	return "Use echo $something | copy-pasta to copy and copy-pasta to paste"
 }
 
 func copyPaste(target *runcommands.Target) error {
