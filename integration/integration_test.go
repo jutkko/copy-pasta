@@ -268,7 +268,7 @@ targets:
 				})
 			})
 
-			Context("when targets", func() {
+			Context("targets", func() {
 				It("should should list the targets", func() {
 					args = []string{"login", "--target", "myTargetOne"}
 					createCmd()
@@ -316,7 +316,7 @@ targets:
 					createCmd()
 
 					session = runBinary()
-					<-session.Exited
+					session.Wait(10 * time.Second)
 
 					Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetOne"))
 					Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetTwo"))
@@ -325,12 +325,24 @@ targets:
 			})
 		})
 
+		Context("help", func() {
+			It("should show some help for the app in stderr", func() {
+				args = []string{"help"}
+				createCmd()
+				session := runBinary()
+				Eventually(session.Err).Should(gbytes.Say("Usage: copy-pasta"))
+
+				session.Wait(10 * time.Second)
+				Expect(session.ExitCode()).NotTo(Equal(0))
+			})
+		})
+
 		Context("something invalid", func() {
 			It("should inform that the command is not valid", func() {
 				args = []string{"ligon", "--target", "myTarget"}
 				createCmd()
 				session := runBinary()
-				Eventually(session.Out).Should(gbytes.Say("ligon is not a valid command"))
+				Eventually(session.Err).Should(gbytes.Say("Usage: copy-pasta"))
 
 				session.Wait(10 * time.Second)
 				Expect(session.ExitCode()).ToNot(Equal(0))
