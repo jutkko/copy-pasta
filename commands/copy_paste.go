@@ -47,6 +47,27 @@ func (c *CopyPasteCommand) Synopsis() string {
 	return "Provides debugging information for operators"
 }
 
+func copyPaste(target *runcommands.Target) error {
+	client, err := minioClient(target)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+	}
+
+	bucketName, objectName, location := s3BucketInfo(target)
+	if isFromAPipe() {
+		if err = store.S3Write(client, bucketName, objectName, location, os.Stdin); err != nil {
+			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
+		}
+	} else {
+		content, err := store.S3Read(client, bucketName, objectName)
+		if err != nil {
+			return errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
+		}
+		fmt.Print(content)
+	}
+	return nil
+}
+
 func isFromAPipe() bool {
 	stat, err := os.Stdin.Stat()
 	if err != nil {
@@ -81,27 +102,6 @@ func s3BucketInfo(target *runcommands.Target) (string, string, string) {
 	return target.BucketName,
 		getOrElse("S3OBJECTNAME", "default-object-name"),
 		getOrElse("S3LOCATION", "eu-west-2")
-}
-
-func copyPaste(target *runcommands.Target) error {
-	client, err := minioClient(target)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
-	}
-
-	bucketName, objectName, location := s3BucketInfo(target)
-	if isFromAPipe() {
-		if err = store.S3Write(client, bucketName, objectName, location, os.Stdin); err != nil {
-			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
-		}
-	} else {
-		content, err := store.S3Read(client, bucketName, objectName)
-		if err != nil {
-			return errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
-		}
-		fmt.Print(content)
-	}
-	return nil
 }
 
 func loadRunCommands() (*runcommands.Config, *InvalidConfig) {
