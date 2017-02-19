@@ -1,18 +1,4 @@
-# copy-pasta
-To use, do the following setup on the two machines you want to `copy-pasta`
-
-```
-go get github.com/jutkko/copy-pasta
-```
-
-Login on the machines you want to do `copy-pasta`
-
-```
-copy-pasta login --target my-copy-pasta
-<Enter your S3 accesskey>
-<Enter your S3 secretaccesskey>
-```
-
+# How to use
 ## Single lined stuff
  To copy, on one machine you do
 
@@ -47,7 +33,7 @@ copy-pasta > myPenne.jpg
 
 Boom! You should see a copy of `myPenne.jpg` on your other machine.
 
-# Multi-user
+## Multi-user
 Are you sharing a machine with others? Or you want to have multiple clipboards?
 `copy-pasta` now supports [concourse](https://concourse.ci) `fly` like targets.
 Remember the `--target` option in the `login` command?  After specifying
@@ -67,6 +53,21 @@ copy-pasta target your-copy-pasta
 
 You will be using another `copy-pasta` destination. **Note the credentials can
 be the same one!**
+
+# Installation
+To use, do the following setup on the two machines you want to `copy-pasta`
+
+```
+go get github.com/jutkko/copy-pasta
+```
+
+Login on the machines you want to do `copy-pasta`
+
+```
+copy-pasta login --target my-copy-pasta
+<Enter your S3 accesskey>
+<Enter your S3 secretaccesskey>
+```
 
 # Running the tests
 You will need to have a working go environment, and go to the repo
