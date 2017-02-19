@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/mitchellh/cli"
+	"github.com/jutkko/cli"
 )
 
 type TargetsCommand struct {
@@ -25,7 +25,6 @@ func (t *TargetsCommand) Run(args []string) int {
 	t.Ui.Output("  " + config.CurrentTarget.Name)
 
 	t.Ui.Output("copy-pasta saved targets:")
-
 	for _, target := range config.Targets {
 		t.Ui.Output(fmt.Sprintf("  %s", target.Name))
 	}

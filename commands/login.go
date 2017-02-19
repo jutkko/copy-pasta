@@ -1,16 +1,13 @@
 package commands
 
 import (
-	"bufio"
 	"crypto/md5"
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"os"
-	"strings"
 
+	"github.com/jutkko/cli"
 	"github.com/jutkko/copy-pasta/runcommands"
-	"github.com/mitchellh/cli"
 )
 
 var pastas = []string{
@@ -107,9 +104,17 @@ func (l *LoginCommand) Run(args []string) int {
 		return 10
 	}
 
-	reader := bufio.NewReader(os.Stdin)
-	accessKey, _ := prompt("Please enter key: ", reader)
-	secretAccessKey, _ := prompt("Please enter secret key: ", reader)
+	accessKey, err := l.Ui.Ask("Please enter key:")
+	if err != nil {
+		l.Ui.Error(err.Error())
+		return 10
+	}
+
+	secretAccessKey, err := l.Ui.AskSecret("Please enter secret key:")
+	if err != nil {
+		l.Ui.Error(err.Error())
+		return 10
+	}
 
 	if err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption)); err != nil {
 		l.Ui.Error(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
@@ -129,14 +134,4 @@ func getBucketName(salt string) string {
 	pastaIndex := int(suffix[0]) % len(pastas)
 
 	return fmt.Sprintf("%s-%s", pastas[pastaIndex], hex.EncodeToString(suffix[:]))
-}
-
-func prompt(message string, reader *bufio.Reader) (string, error) {
-	fmt.Print(message)
-	resultWithNewLine, err := reader.ReadString('\n')
-	// TODO test this?
-	if err != nil {
-		return "", err
-	}
-	return strings.Trim(resultWithNewLine, "\n"), nil
 }

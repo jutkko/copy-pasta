@@ -1,6 +1,7 @@
 package integration_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -298,7 +299,7 @@ targets:
 				Expect(os.RemoveAll(tmpDir)).To(Succeed())
 			})
 
-			It("should should list the targets", func() {
+			It("should list the targets", func() {
 				args = []string{"login", "--target", "myTargetOne"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
@@ -313,6 +314,9 @@ targets:
 
 				Expect(session.ExitCode()).To(Equal(0))
 				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
+				f, err := ioutil.ReadFile(filepath.Join(userHomeDir(), ".copy-pastarc"))
+				Expect(err).ToNot(HaveOccurred())
+				fmt.Printf("file is: %s", string(f))
 
 				args = []string{"login", "--target", "myTargetTwo"}
 				createCmd()

@@ -3,8 +3,8 @@ package commands
 import (
 	"fmt"
 
+	"github.com/jutkko/cli"
 	"github.com/jutkko/copy-pasta/runcommands"
-	"github.com/mitchellh/cli"
 )
 
 type TargetCommand struct {

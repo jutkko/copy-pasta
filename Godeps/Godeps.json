@@ -12,6 +12,10 @@
 			"Rev": "675b82c74c0ed12283ee81ba8a534c8982c07b85"
 		},
 		{
+			"ImportPath": "github.com/jutkko/cli",
+			"Rev": "bd89e46a203f012c36d90d0a999ef213a178f0ee"
+		},
+		{
 			"ImportPath": "github.com/mattn/go-isatty",
 			"Rev": "dda3de49cbfcec471bd7a70e6cc01fcc3ff90109"
 		},
@@ -39,10 +43,6 @@
 			"ImportPath": "github.com/minio/minio-go/pkg/set",
 			"Comment": "v2.0.3-6-g83ba3bc",
 			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
-		},
-		{
-			"ImportPath": "github.com/mitchellh/cli",
-			"Rev": "494eb006fe29e9dc75fea6da4df4818f7e046b73"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
