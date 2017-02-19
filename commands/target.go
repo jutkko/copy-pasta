@@ -16,12 +16,12 @@ func (t *TargetCommand) Help() string {
 }
 
 func (t *TargetCommand) Run(args []string) int {
-	if len(args) > 0 {
-		config, err := loadRunCommands()
-		if err != nil {
-			return 1
-		}
+	config, err := loadRunCommands()
+	if err != nil {
+		return 1
+	}
 
+	if len(args) > 0 {
 		if target, ok := config.Targets[args[0]]; ok {
 			if err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName); err != nil {
 				t.Ui.Error(fmt.Sprintf("Failed to update the current target: %s", err.Error()))
@@ -34,8 +34,9 @@ func (t *TargetCommand) Run(args []string) int {
 			return 3
 		}
 	} else {
-		t.Ui.Error("No target provided")
-		return 4
+		t.Ui.Output("copy-pasta current target:")
+		t.Ui.Output("  " + config.CurrentTarget.Name)
+		return 0
 	}
 }
 

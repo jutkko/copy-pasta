@@ -257,19 +257,7 @@ targets:
 			})
 
 			Context("when there is no target", func() {
-				It("should should fail", func() {
-					args = []string{"target"}
-					createCmd()
-					session := runBinary()
-					Eventually(session.Out).Should(gbytes.Say("No target provided"))
-
-					session.Wait(10 * time.Second)
-					Expect(session.ExitCode()).ToNot(Equal(0))
-				})
-			})
-
-			Context("targets", func() {
-				It("should should list the targets", func() {
+				It("should display the current target", func() {
 					args = []string{"login", "--target", "myTargetOne"}
 					createCmd()
 					loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
@@ -282,46 +270,89 @@ targets:
 					session := runBinary()
 					session.Wait(10 * time.Second)
 
-					Expect(session.ExitCode()).To(Equal(0))
-					Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
-
-					args = []string{"login", "--target", "myTargetTwo"}
+					args = []string{"target"}
 					createCmd()
-					stdinPipe = getStdinPipe()
-					_, err = stdinPipe.Write(loginWriteContent)
-					Expect(err).ToNot(HaveOccurred())
-					err = stdinPipe.Close()
-					Expect(err).ToNot(HaveOccurred())
-
 					session = runBinary()
-					session.Wait(10 * time.Second)
+					Eventually(session.Out).Should(gbytes.Say("myTargetOne"))
 
+					session.Wait(10 * time.Second)
 					Expect(session.ExitCode()).To(Equal(0))
-					Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
-
-					args = []string{}
-					createCmd()
-					stdinPipe = getStdinPipe()
-					_, err = stdinPipe.Write([]byte("Hi from targetTwo"))
-					Expect(err).ToNot(HaveOccurred())
-
-					session = runBinary()
-					err = stdinPipe.Close()
-					Expect(err).ToNot(HaveOccurred())
-					session.Wait(10 * time.Second)
-
-					Expect(session.ExitCode()).To(Equal(0))
-
-					args = []string{"targets"}
-					createCmd()
-
-					session = runBinary()
-					session.Wait(10 * time.Second)
-
-					Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetOne"))
-					Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetTwo"))
-					Expect(string(session.Out.Contents())).ToNot(ContainSubstring("Hi from targetTwo"))
 				})
+			})
+
+		})
+
+		Context("targets", func() {
+			var tmpDir string
+			var err error
+			BeforeEach(func() {
+				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
+				Expect(err).ToNot(HaveOccurred())
+
+				os.Setenv("HOME", tmpDir)
+				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
+				os.Setenv("S3LOCATION", "us-east-1")
+			})
+
+			AfterEach(func() {
+				Expect(os.RemoveAll(tmpDir)).To(Succeed())
+			})
+
+			It("should should list the targets", func() {
+				args = []string{"login", "--target", "myTargetOne"}
+				createCmd()
+				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
+				stdinPipe := getStdinPipe()
+				_, err := stdinPipe.Write(loginWriteContent)
+				Expect(err).ToNot(HaveOccurred())
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				session := runBinary()
+				session.Wait(10 * time.Second)
+
+				Expect(session.ExitCode()).To(Equal(0))
+				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
+
+				args = []string{"login", "--target", "myTargetTwo"}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				_, err = stdinPipe.Write(loginWriteContent)
+				Expect(err).ToNot(HaveOccurred())
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+				session.Wait(10 * time.Second)
+
+				Expect(session.ExitCode()).To(Equal(0))
+				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
+
+				args = []string{}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				_, err = stdinPipe.Write([]byte("Hi from targetTwo"))
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+				session.Wait(10 * time.Second)
+
+				Expect(session.ExitCode()).To(Equal(0))
+
+				args = []string{"targets"}
+				createCmd()
+
+				session = runBinary()
+				session.Wait(10 * time.Second)
+
+				// lists the current target
+				Expect(string(session.Out.Contents())).To(ContainSubstring("copy-pasta current target:"))
+
+				Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetOne"))
+				Expect(string(session.Out.Contents())).To(ContainSubstring("myTargetTwo"))
+				Expect(string(session.Out.Contents())).ToNot(ContainSubstring("Hi from targetTwo"))
 			})
 		})
 

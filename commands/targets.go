@@ -21,10 +21,13 @@ func (t *TargetsCommand) Run(args []string) int {
 		return 6
 	}
 
-	fmt.Println("copy-pasta targets:")
+	t.Ui.Output("copy-pasta current target:")
+	t.Ui.Output("  " + config.CurrentTarget.Name)
+
+	t.Ui.Output("copy-pasta saved targets:")
 
 	for _, target := range config.Targets {
-		fmt.Printf("  %s\n", target.Name)
+		t.Ui.Output(fmt.Sprintf("  %s", target.Name))
 	}
 
 	return 0
