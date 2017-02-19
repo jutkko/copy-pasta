@@ -1,7 +1,6 @@
 package integration_test
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -314,9 +313,7 @@ targets:
 
 				Expect(session.ExitCode()).To(Equal(0))
 				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
-				f, err := ioutil.ReadFile(filepath.Join(userHomeDir(), ".copy-pastarc"))
 				Expect(err).ToNot(HaveOccurred())
-				fmt.Printf("file is: %s", string(f))
 
 				args = []string{"login", "--target", "myTargetTwo"}
 				createCmd()
