@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jutkko/copy-pasta.svg?branch=master)](https://travis-ci.org/jutkko/copy-pasta)
+
 # How to use
 ## Single lined stuff
  To copy, on one machine you do
