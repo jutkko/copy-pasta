@@ -102,7 +102,7 @@ here! Here's some
 Non-interactive logon
 
 ```
-printf "%s\n%s\n" "$ACESSKEY" "$SECRETACCESSKEY" | copy-pasta login --target my-target
+printf "%s\n%s\n" "$ACCESSKEY" "$SECRETACCESSKEY" | copy-pasta login --target my-target
 ```
 
 Paste straight to pbcopy
