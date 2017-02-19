@@ -5,6 +5,7 @@ go:
   - tip
 
 install:
+  - go get github.com/onsi/gomega
   - go get github.com/onsi/ginkgo/ginkgo
 
 script:
