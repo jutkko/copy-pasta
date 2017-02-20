@@ -23,7 +23,11 @@ func (ic *InvalidConfig) Error() string {
 type CopyPasteCommand struct{}
 
 func (c *CopyPasteCommand) Help() string {
-	return "Use echo $something | copy-pasta to copy and copy-pasta to paste"
+	return `Usage to paste: copy-pasta
+Usage to copy: <some command> | copy-pasta
+
+    Copy or paste using copy-pasta.
+`
 }
 
 func (c *CopyPasteCommand) Run(args []string) int {
@@ -44,7 +48,7 @@ func (c *CopyPasteCommand) Run(args []string) int {
 }
 
 func (c *CopyPasteCommand) Synopsis() string {
-	return "Use echo $something | copy-pasta to copy and copy-pasta to paste"
+	return "Copy or paste using copy-pasta"
 }
 
 func copyPaste(target *runcommands.Target) error {

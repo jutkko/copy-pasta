@@ -90,7 +90,14 @@ type LoginCommand struct {
 }
 
 func (l *LoginCommand) Help() string {
-	return "Lists the targets on this machine"
+	return `Usage: copy-pasta login [--target] [<target>]
+
+    Prompts to login interactively. If no target is provided,
+    the  "default" target naem is provided.
+
+Options:
+    --target     Specify the new target name.
+`
 }
 
 func (l *LoginCommand) Run(args []string) int {
@@ -126,7 +133,7 @@ func (l *LoginCommand) Run(args []string) int {
 }
 
 func (l *LoginCommand) Synopsis() string {
-	return "Lists the targets on this machine"
+	return fmt.Sprintf("Login to copy-pasta")
 }
 
 func getBucketName(salt string) string {

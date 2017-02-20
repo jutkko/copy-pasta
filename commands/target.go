@@ -12,7 +12,11 @@ type TargetCommand struct {
 }
 
 func (t *TargetCommand) Help() string {
-	return "Changes the current target to the provided target"
+	return `Usage: copy-pasta target [<target>]
+
+    Changes the current target to the target.
+    If no argument is provided, it lists the current target.
+`
 }
 
 func (t *TargetCommand) Run(args []string) int {

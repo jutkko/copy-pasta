@@ -11,7 +11,10 @@ type TargetsCommand struct {
 }
 
 func (t *TargetsCommand) Help() string {
-	return "Lists the targets on this machine"
+	return `Usage: copy-pasta targets
+
+    List the current as well as all the saved targets.
+`
 }
 
 func (t *TargetsCommand) Run(args []string) int {
@@ -33,5 +36,5 @@ func (t *TargetsCommand) Run(args []string) int {
 }
 
 func (t *TargetsCommand) Synopsis() string {
-	return "Lists the targets on this machine"
+	return "List the current as well as the saved targets"
 }
