@@ -57,13 +57,12 @@ func copyPaste(target *runcommands.Target) error {
 		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
 	}
 
-	bucketName, objectName, location := s3BucketInfo(target)
 	if isFromAPipe() {
-		if err = store.S3Write(client, bucketName, objectName, location, os.Stdin); err != nil {
+		if err = store.S3Write(client, target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
 			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
 	} else {
-		content, err := store.S3Read(client, bucketName, objectName)
+		content, err := store.S3Read(client, target.BucketName, "default-object-name")
 		if err != nil {
 			return errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
 		}
@@ -99,12 +98,6 @@ func getOrElse(key, defaultValue string) string {
 	}
 
 	return result
-}
-
-func s3BucketInfo(t *runcommands.Target) (string, string, string) {
-	return t.BucketName,
-		"default-object-name",
-		t.Location
 }
 
 func loadRunCommands() (*runcommands.Config, *InvalidConfig) {
