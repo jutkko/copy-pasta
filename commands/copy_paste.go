@@ -82,10 +82,7 @@ func isFromAPipe() bool {
 }
 
 func minioClient(t *runcommands.Target) (*minio.Client, error) {
-	var endpoint string
-	if endpoint = os.Getenv("S3ENDPOINT"); endpoint == "" {
-		endpoint = "s3.amazonaws.com"
-	}
+	endpoint := t.Endpoint
 	accessKeyID := t.AccessKey
 	secretAccessKey := t.SecretAccessKey
 	useSSL := true
@@ -102,10 +99,10 @@ func getOrElse(key, defaultValue string) string {
 	return result
 }
 
-func s3BucketInfo(target *runcommands.Target) (string, string, string) {
-	return target.BucketName,
-		getOrElse("S3OBJECTNAME", "default-object-name"),
-		getOrElse("S3LOCATION", "eu-west-2")
+func s3BucketInfo(t *runcommands.Target) (string, string, string) {
+	return t.BucketName,
+		"default-object-name",
+		t.Location
 }
 
 func loadRunCommands() (*runcommands.Config, *InvalidConfig) {

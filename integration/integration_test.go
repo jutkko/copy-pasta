@@ -22,8 +22,6 @@ var _ = Describe("Main", func() {
 				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
 				Expect(err).ToNot(HaveOccurred())
 
-				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
-				os.Setenv("S3LOCATION", "us-east-1")
 				os.Setenv("HOME", tmpDir)
 
 				// this example uses the test minio endpoint
@@ -33,12 +31,16 @@ var _ = Describe("Main", func() {
   accesskey: Q3AM3UQ867SPQQA43P2F
   secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
   bucketname: bucket-name
+  endpoint: play.minio.io:9000
+  location: us-east-1
 targets:
   some-target:
     name: some-target
     accesskey: Q3AM3UQ867SPQQA43P2F
     secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
-    bucketname: bucket-name`
+    bucketname: bucket-name
+    endpoint: play.minio.io:9000
+    location: us-east-1`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 				writeContent = []byte("HHHHHHHHHHey\nBye")
 			})
@@ -98,8 +100,6 @@ targets:
 				Expect(err).ToNot(HaveOccurred())
 
 				os.Setenv("HOME", tmpDir)
-				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
-				os.Setenv("S3LOCATION", "us-east-1")
 				writeContent = []byte("This is copy-pasta\nBye")
 			})
 
@@ -109,7 +109,7 @@ targets:
 
 			// this example uses the test minio endpoint
 			It("should prompt for credentials and next time it should work", func() {
-				args = []string{"login", "--target", "myTarget"}
+				args = []string{"login", "--target", "myTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				writeContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -157,8 +157,6 @@ targets:
 				Expect(err).ToNot(HaveOccurred())
 
 				os.Setenv("HOME", tmpDir)
-				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
-				os.Setenv("S3LOCATION", "us-east-1")
 			})
 
 			AfterEach(func() {
@@ -167,7 +165,7 @@ targets:
 
 			// this example uses the test minio endpoint
 			It("should prompt for credentials and next time it should work", func() {
-				args = []string{"login", "--target", "myTargetOne"}
+				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -188,7 +186,7 @@ targets:
 				args = []string{}
 				createCmd()
 				stdinPipe = getStdinPipe()
-				writeContent = []byte("Hi from targetOne")
+				writeContent = []byte("Hi from myTargetOne")
 				_, err = stdinPipe.Write(writeContent)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -200,7 +198,7 @@ targets:
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// login as another target
-				args = []string{"login", "--target", "myTargetTwo"}
+				args = []string{"login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe = getStdinPipe()
@@ -222,7 +220,7 @@ targets:
 				args = []string{}
 				createCmd()
 				stdinPipe = getStdinPipe()
-				writeContent = []byte("Hi from targetTwo")
+				writeContent = []byte("Hi from myTargetTwo")
 				_, err = stdinPipe.Write(writeContent)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -244,7 +242,7 @@ targets:
 				Expect(readString).To(BeEmpty())
 				Expect(session.ExitCode()).To(Equal(0))
 
-				// get hi from targetOne  out
+				// get hi from targetOne out
 				args = []string{}
 				createCmd()
 
@@ -252,7 +250,7 @@ targets:
 				session.Wait(10 * time.Second)
 
 				readString = string(session.Out.Contents())
-				Expect(readString).To(Equal("Hi from targetOne"))
+				Expect(readString).To(Equal("Hi from myTargetOne"))
 				Expect(session.ExitCode()).To(Equal(0))
 			})
 
@@ -290,8 +288,6 @@ targets:
 				Expect(err).ToNot(HaveOccurred())
 
 				os.Setenv("HOME", tmpDir)
-				os.Setenv("S3ENDPOINT", "play.minio.io:9000")
-				os.Setenv("S3LOCATION", "us-east-1")
 			})
 
 			AfterEach(func() {
@@ -299,7 +295,7 @@ targets:
 			})
 
 			It("should list the targets", func() {
-				args = []string{"login", "--target", "myTargetOne"}
+				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -315,7 +311,7 @@ targets:
 				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
 				Expect(err).ToNot(HaveOccurred())
 
-				args = []string{"login", "--target", "myTargetTwo"}
+				args = []string{"login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				stdinPipe = getStdinPipe()
 				_, err = stdinPipe.Write(loginWriteContent)

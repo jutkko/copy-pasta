@@ -27,7 +27,7 @@ func (t *TargetCommand) Run(args []string) int {
 
 	if len(args) > 0 {
 		if target, ok := config.Targets[args[0]]; ok {
-			if err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName); err != nil {
+			if err := runcommands.Update(target.Name, target.AccessKey, target.SecretAccessKey, target.BucketName, target.Endpoint, target.Location); err != nil {
 				t.Ui.Error(fmt.Sprintf("Failed to update the current target: %s", err.Error()))
 				return 2
 			} else {

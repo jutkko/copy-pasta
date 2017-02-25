@@ -103,6 +103,8 @@ Options:
 func (l *LoginCommand) Run(args []string) int {
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
 	loginTargetOption := loginCommand.String("target", "", "the name for copy-pasta's target")
+	loginEndpointOption := loginCommand.String("endpoint", "s3.amazonaws.com", "the endpoint for copy-pasta's backend")
+	loginLocationOption := loginCommand.String("location", "eu-west-2", "the location for the backend bucket")
 
 	// not tested, may be too hard
 	err := loginCommand.Parse(args)
@@ -123,7 +125,7 @@ func (l *LoginCommand) Run(args []string) int {
 		return 10
 	}
 
-	if err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption)); err != nil {
+	if err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption), *loginEndpointOption, *loginLocationOption); err != nil {
 		l.Ui.Error(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
 		return 9
 	}

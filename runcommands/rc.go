@@ -15,6 +15,8 @@ type Target struct {
 	AccessKey       string `yaml:"accesskey"`
 	SecretAccessKey string `yaml:"secretaccesskey"`
 	BucketName      string `yaml:"bucketname"`
+	Endpoint        string `yaml:"endpoint"`
+	Location        string `yaml:"location"`
 }
 
 type Config struct {
@@ -22,7 +24,7 @@ type Config struct {
 	Targets       map[string]*Target `yaml:"targets"`
 }
 
-func Update(target, accessKey, secretAccessKey, bucketName string) error {
+func Update(target, accessKey, secretAccessKey, bucketName, endpoint, location string) error {
 	var config *Config
 	var err error
 
@@ -39,6 +41,8 @@ func Update(target, accessKey, secretAccessKey, bucketName string) error {
 		AccessKey:       accessKey,
 		SecretAccessKey: secretAccessKey,
 		BucketName:      bucketName,
+		Endpoint:        endpoint,
+		Location:        location,
 	}
 
 	config.CurrentTarget = currentTarget
@@ -52,6 +56,7 @@ func Update(target, accessKey, secretAccessKey, bucketName string) error {
 
 	// TODO error case
 	ioutil.WriteFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"), configContents, 0666)
+
 	return nil
 }
 
