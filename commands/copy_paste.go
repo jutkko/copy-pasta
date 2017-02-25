@@ -2,6 +2,7 @@ package commands
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -32,14 +33,22 @@ Usage to copy: <some command> | copy-pasta
 
 func (c *CopyPasteCommand) Run(args []string) int {
 	config, invalidConfig := loadRunCommands()
-
 	if invalidConfig != nil {
 		fmt.Println(invalidConfig)
 		os.Exit(invalidConfig.status)
 	}
 
+	copyPasteCommand := flag.NewFlagSet("", flag.ExitOnError)
+	copyPastePasteOption := copyPasteCommand.Bool("paste", false, "")
+
+	// not tested, may be too hard
+	err := copyPasteCommand.Parse(args)
+	if err != nil {
+		return 10
+	}
+
 	if config != nil {
-		if err := copyPaste(config.CurrentTarget); err != nil {
+		if err := copyPaste(config.CurrentTarget, *copyPastePasteOption); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -51,13 +60,14 @@ func (c *CopyPasteCommand) Synopsis() string {
 	return "Copy or paste using copy-pasta"
 }
 
-func copyPaste(target *runcommands.Target) error {
+func copyPaste(target *runcommands.Target, paste bool) error {
 	client, err := minioClient(target)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
 	}
 
-	if isFromAPipe() {
+	if isFromAPipe() && !paste {
+		println("should come here ", paste)
 		if err = store.S3Write(client, target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
 			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
