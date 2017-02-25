@@ -33,6 +33,7 @@ func S3Write(client MinioClient, bucketName, objectName, location string, conten
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

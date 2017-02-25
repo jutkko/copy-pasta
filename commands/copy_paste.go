@@ -69,6 +69,7 @@ func copyPaste(target *runcommands.Target) error {
 		}
 		fmt.Print(content)
 	}
+
 	return nil
 }
 
@@ -96,6 +97,7 @@ func getOrElse(key, defaultValue string) string {
 	if result == "" {
 		return defaultValue
 	}
+
 	return result
 }
 
@@ -113,5 +115,6 @@ func loadRunCommands() (*runcommands.Config, *InvalidConfig) {
 			status: 1,
 		}
 	}
+
 	return loadedConfig, nil
 }

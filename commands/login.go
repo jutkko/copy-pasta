@@ -131,6 +131,7 @@ func (l *LoginCommand) Run(args []string) int {
 	}
 
 	fmt.Println("Log in information saved")
+
 	return 0
 }
 
