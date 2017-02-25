@@ -71,6 +71,9 @@ copy-pasta login --target my-copy-pasta
 <Enter your S3 secretaccesskey>
 ```
 
+If you are not using Amazon S3, you might want to pass the `endpoint` and 
+`location` of your S3 backend implementation when you target.
+
 # Running the tests
 You will need to have a working go environment, and go to the repo
 
