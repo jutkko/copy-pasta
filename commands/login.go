@@ -90,13 +90,15 @@ type LoginCommand struct {
 }
 
 func (l *LoginCommand) Help() string {
-	return `Usage: copy-pasta login [--target] [<target>]
+	return `Usage: copy-pasta login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
 
     Prompts to login interactively. If no target is provided,
     the  "default" target naem is provided.
 
 Options:
-    --target     Specify the new target name.
+    --target       Specify the new target name.
+    --endpoint     Specify the new target's endpoint, defaults to s3.amazonaws.com.
+    --location     Specify the new target's location, defaults to eu-west-2.
 `
 }
 
