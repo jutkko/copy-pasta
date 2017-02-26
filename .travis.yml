@@ -7,12 +7,10 @@ go:
 before_install:
   - go get github.com/mattn/goveralls
 
-script:
-  - $HOME/gopath/bin/goveralls -service=travis-ci
-
 install:
   - go get github.com/onsi/gomega
   - go get github.com/onsi/ginkgo/ginkgo
 
 script:
   - ginkgo -r
+  - $HOME/gopath/bin/goveralls -service=travis-ci
