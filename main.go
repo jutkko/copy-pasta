@@ -29,7 +29,7 @@ func main() {
 
 	c.Commands = map[string]cli.CommandFactory{
 		"": func() (cli.Command, error) {
-			return &commands.CopyPasteCommand{}, nil
+			return &commands.CopyPasteCommand{Ui: uiColored}, nil
 		},
 
 		"login": func() (cli.Command, error) {
@@ -37,11 +37,11 @@ func main() {
 		},
 
 		"target": func() (cli.Command, error) {
-			return &commands.TargetCommand{Ui: ui}, nil
+			return &commands.TargetCommand{Ui: uiColored}, nil
 		},
 
 		"targets": func() (cli.Command, error) {
-			return &commands.TargetsCommand{Ui: ui}, nil
+			return &commands.TargetsCommand{Ui: uiColored}, nil
 		},
 	}
 

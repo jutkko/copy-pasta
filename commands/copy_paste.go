@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/jutkko/cli"
 	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store"
 	minio "github.com/minio/minio-go"
@@ -21,7 +22,9 @@ func (ic *InvalidConfig) Error() string {
 	return ic.error
 }
 
-type CopyPasteCommand struct{}
+type CopyPasteCommand struct {
+	Ui cli.Ui
+}
 
 func (c *CopyPasteCommand) Help() string {
 	return `Usage to paste: copy-pasta [--paste]
@@ -35,7 +38,7 @@ Usage to copy: <some command with output> | copy-pasta
 func (c *CopyPasteCommand) Run(args []string) int {
 	config, invalidConfig := loadRunCommands()
 	if invalidConfig != nil {
-		fmt.Println(invalidConfig)
+		c.Ui.Error(fmt.Sprintf("Failed to load the runcommands file: %s", invalidConfig.Error()))
 		os.Exit(invalidConfig.status)
 	}
 
@@ -49,9 +52,14 @@ func (c *CopyPasteCommand) Run(args []string) int {
 	}
 
 	if config != nil {
-		if err := copyPaste(config.CurrentTarget, *copyPastePasteOption); err != nil {
-			log.Fatal(err)
+		content, err := copyPaste(config.CurrentTarget, *copyPastePasteOption)
+		if err != nil {
+			c.Ui.Error(fmt.Sprintf("Failed to load the runcommands file: %s", err.Error()))
+			os.Exit(-15)
 		}
+
+		// cannot use c.Ui sicne it prints a newline
+		fmt.Print(content)
 	}
 
 	return 0
@@ -61,26 +69,26 @@ func (c *CopyPasteCommand) Synopsis() string {
 	return "Copy or paste using copy-pasta"
 }
 
-func copyPaste(target *runcommands.Target, paste bool) error {
+func copyPaste(target *runcommands.Target, paste bool) (string, error) {
 	client, err := minioClient(target)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+		return "", errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
 	}
 
 	if isFromAPipe() && !paste {
-		println("should come here ", paste)
 		if err = store.S3Write(client, target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
-			return errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
+			return "", errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
 		}
+
+		return "", nil
 	} else {
 		content, err := store.S3Read(client, target.BucketName, "default-object-name")
 		if err != nil {
-			return errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
+			return "", errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
 		}
-		fmt.Print(content)
-	}
 
-	return nil
+		return content, nil
+	}
 }
 
 func isFromAPipe() bool {
