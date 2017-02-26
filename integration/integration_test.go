@@ -92,21 +92,69 @@ targets:
 	})
 
 	Describe("when flags are passed", func() {
-		Context("login", func() {
-			var tmpDir string
-			var err error
-			BeforeEach(func() {
-				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
+		var tmpDir string
+		var err error
+		BeforeEach(func() {
+			tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
+			Expect(err).ToNot(HaveOccurred())
+
+			os.Setenv("HOME", tmpDir)
+		})
+
+		AfterEach(func() {
+			Expect(os.RemoveAll(tmpDir)).To(Succeed())
+		})
+
+		Context("--paste", func() {
+			It("should just paste even though there is stdin pipe to it", func() {
+				args = []string{"login", "--target", "myPasteTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				createCmd()
+				writeContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
+				stdinPipe := getStdinPipe()
+				_, err := stdinPipe.Write(writeContent)
+				Expect(err).ToNot(HaveOccurred())
+				err = stdinPipe.Close()
 				Expect(err).ToNot(HaveOccurred())
 
-				os.Setenv("HOME", tmpDir)
-				writeContent = []byte("This is copy-pasta\nBye")
-			})
+				session := runBinary()
+				session.Wait(10 * time.Second)
 
-			AfterEach(func() {
-				Expect(os.RemoveAll(tmpDir)).To(Succeed())
-			})
+				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 
+				// copy something to it
+				args = []string{}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				_, err = stdinPipe.Write([]byte("something"))
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+				session.Wait(10 * time.Second)
+				Expect(session.ExitCode()).To(Equal(0))
+
+				// tries to copy something else
+				args = []string{"--paste"}
+				createCmd()
+				stdinPipe = getStdinPipe()
+				_, err = stdinPipe.Write([]byte("something else"))
+				Expect(err).ToNot(HaveOccurred())
+
+				session = runBinary()
+
+				err = stdinPipe.Close()
+				Expect(err).ToNot(HaveOccurred())
+				session.Wait(10 * time.Second)
+				Expect(session.ExitCode()).To(Equal(0))
+
+				readString := string(session.Out.Contents())
+				Expect(readString).To(Equal("something"))
+			})
+		})
+
+		Context("login", func() {
 			// this example uses the test minio endpoint
 			It("should prompt for credentials and next time it should work", func() {
 				args = []string{"login", "--target", "myTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
@@ -150,21 +198,8 @@ targets:
 		})
 
 		Context("target", func() {
-			var tmpDir string
-			var err error
-			BeforeEach(func() {
-				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
-				Expect(err).ToNot(HaveOccurred())
-
-				os.Setenv("HOME", tmpDir)
-			})
-
-			AfterEach(func() {
-				Expect(os.RemoveAll(tmpDir)).To(Succeed())
-			})
-
 			// this example uses the test minio endpoint
-			It("should prompt for credentials and next time it should work", func() {
+			It("should change to the newly specified target", func() {
 				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
@@ -277,23 +312,9 @@ targets:
 					Expect(session.ExitCode()).To(Equal(0))
 				})
 			})
-
 		})
 
 		Context("targets", func() {
-			var tmpDir string
-			var err error
-			BeforeEach(func() {
-				tmpDir, err = ioutil.TempDir("", "copy-pasta-test")
-				Expect(err).ToNot(HaveOccurred())
-
-				os.Setenv("HOME", tmpDir)
-			})
-
-			AfterEach(func() {
-				Expect(os.RemoveAll(tmpDir)).To(Succeed())
-			})
-
 			It("should list the targets", func() {
 				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
