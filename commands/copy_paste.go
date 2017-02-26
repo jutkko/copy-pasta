@@ -24,10 +24,11 @@ func (ic *InvalidConfig) Error() string {
 type CopyPasteCommand struct{}
 
 func (c *CopyPasteCommand) Help() string {
-	return `Usage to paste: copy-pasta
-Usage to copy: <some command> | copy-pasta
+	return `Usage to paste: copy-pasta [--paste]
+Usage to copy: <some command with output> | copy-pasta
 
-    Copy or paste using copy-pasta.
+    Copy or paste using copy-pasta. Use --paste to force copy-pasta to
+		ignore its stdin and output from the current target.
 `
 }
 
