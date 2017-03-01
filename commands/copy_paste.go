@@ -58,7 +58,7 @@ func (c *CopyPasteCommand) Run(args []string) int {
 			os.Exit(-15)
 		}
 
-		// cannot use c.Ui sicne it prints a newline
+		// cannot use c.Ui since it prints a newline
 		fmt.Print(content)
 	}
 
