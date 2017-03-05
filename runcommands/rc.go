@@ -1,7 +1,6 @@
 package runcommands
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -10,6 +9,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// Target is the strut for a copy-pasta target
 type Target struct {
 	Name            string `yaml:"name"`
 	AccessKey       string `yaml:"accesskey"`
@@ -19,11 +19,13 @@ type Target struct {
 	Location        string `yaml:"location"`
 }
 
+// Config is the aggregation of currrent targets
 type Config struct {
 	CurrentTarget *Target            `yaml:"currenttarget"`
 	Targets       map[string]*Target `yaml:"targets"`
 }
 
+// Update updates the config file
 func Update(target, accessKey, secretAccessKey, bucketName, endpoint, location string) error {
 	var config *Config
 	var err error
@@ -60,16 +62,17 @@ func Update(target, accessKey, secretAccessKey, bucketName, endpoint, location s
 	return nil
 }
 
+// Load loads the config from a runcommands file
 func Load() (*Config, error) {
 	var config *Config
 
 	byteContent, err := ioutil.ReadFile(filepath.Join(os.Getenv("HOME"), ".copy-pastarc"))
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Unable to load the targets, please check if ~/.copy-pastarc exists %s", err.Error()))
+		return nil, fmt.Errorf("Unable to load the targets, please check if ~/.copy-pastarc exists %s", err.Error())
 	}
 	err = yaml.Unmarshal(byteContent, &config)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Parsing failed %s", err.Error()))
+		return nil, fmt.Errorf("Parsing failed %s", err.Error())
 	}
 
 	return config, nil
