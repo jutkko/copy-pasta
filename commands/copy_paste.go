@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -13,6 +12,7 @@ import (
 	minio "github.com/minio/minio-go"
 )
 
+// InvalidConfig is the custom error struct for invalid configuration files
 type InvalidConfig struct {
 	error  string
 	status int
@@ -22,10 +22,13 @@ func (ic *InvalidConfig) Error() string {
 	return ic.error
 }
 
+// CopyPasteCommand is the command that is responsible for the actual copying
+// and pasting
 type CopyPasteCommand struct {
 	Ui cli.Ui
 }
 
+// Help string
 func (c *CopyPasteCommand) Help() string {
 	return `Usage to paste: copy-pasta [--paste]
 Usage to copy: <some command with output> | copy-pasta
@@ -35,6 +38,7 @@ Usage to copy: <some command with output> | copy-pasta
 `
 }
 
+// Run function for the command
 func (c *CopyPasteCommand) Run(args []string) int {
 	config, invalidConfig := loadRunCommands()
 	if invalidConfig != nil {
@@ -65,6 +69,7 @@ func (c *CopyPasteCommand) Run(args []string) int {
 	return 0
 }
 
+// Synopsis is the short help string
 func (c *CopyPasteCommand) Synopsis() string {
 	return "Copy or paste using copy-pasta"
 }
@@ -72,19 +77,19 @@ func (c *CopyPasteCommand) Synopsis() string {
 func copyPaste(target *runcommands.Target, paste bool) (string, error) {
 	client, err := minioClient(target)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("Failed initializing client: %s\n", err.Error()))
+		return "", fmt.Errorf("failed initializing client: %s", err.Error())
 	}
 
 	if isFromAPipe() && !paste {
 		if err = store.S3Write(client, target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
-			return "", errors.New(fmt.Sprintf("Failed writing to the bucket: %s\n", err.Error()))
+			return "", fmt.Errorf("failed writing to the bucket: %s", err.Error())
 		}
 
 		return "", nil
 	} else {
 		content, err := store.S3Read(client, target.BucketName, "default-object-name")
 		if err != nil {
-			return "", errors.New(fmt.Sprintf("Have you copied yet? Failed reading the bucket: %s\n", err.Error()))
+			return "", fmt.Errorf("Have you copied yet? Failed reading the bucket: %s", err.Error())
 		}
 
 		return content, nil

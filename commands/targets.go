@@ -6,10 +6,12 @@ import (
 	"github.com/jutkko/cli"
 )
 
+// TargetsCommand is the command that lists the current targets
 type TargetsCommand struct {
 	Ui cli.Ui
 }
 
+// Help string
 func (t *TargetsCommand) Help() string {
 	return `Usage: copy-pasta targets
 
@@ -17,6 +19,7 @@ func (t *TargetsCommand) Help() string {
 `
 }
 
+// Run function for the command
 func (t *TargetsCommand) Run(args []string) int {
 	config, err := loadRunCommands()
 	if err != nil {
@@ -35,6 +38,7 @@ func (t *TargetsCommand) Run(args []string) int {
 	return 0
 }
 
+// Synopsis is the short help string
 func (t *TargetsCommand) Synopsis() string {
 	return "List the current as well as the saved targets"
 }

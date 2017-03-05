@@ -7,10 +7,13 @@ import (
 	"github.com/jutkko/copy-pasta/runcommands"
 )
 
+// TargetCommand is the command that is responsible setting the copy-pasta
+// targets
 type TargetCommand struct {
 	Ui cli.Ui
 }
 
+// Help string
 func (t *TargetCommand) Help() string {
 	return `Usage: copy-pasta target [<target>]
 
@@ -19,6 +22,7 @@ func (t *TargetCommand) Help() string {
 `
 }
 
+// Run function for the command
 func (t *TargetCommand) Run(args []string) int {
 	config, err := loadRunCommands()
 	if err != nil {
@@ -44,6 +48,7 @@ func (t *TargetCommand) Run(args []string) int {
 	}
 }
 
+// Synopsis is the short help string
 func (t *TargetCommand) Synopsis() string {
 	return "Changes the current target to the provided target"
 }

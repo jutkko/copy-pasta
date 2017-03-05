@@ -85,10 +85,13 @@ var pastas = []string{
 	"vermicelli",
 }
 
+// LoginCommand is the command that is responsible for logging in, the
+// size effect is that it saves the config file locally
 type LoginCommand struct {
 	Ui cli.Ui
 }
 
+// Help string
 func (l *LoginCommand) Help() string {
 	return `Usage: copy-pasta login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
 
@@ -102,6 +105,7 @@ Options:
 `
 }
 
+// Run function for the command
 func (l *LoginCommand) Run(args []string) int {
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
 	loginTargetOption := loginCommand.String("target", "", "the name for copy-pasta's target")
@@ -137,6 +141,7 @@ func (l *LoginCommand) Run(args []string) int {
 	return 0
 }
 
+// Synopsis is the short help string
 func (l *LoginCommand) Synopsis() string {
 	return fmt.Sprintf("Login to copy-pasta")
 }
