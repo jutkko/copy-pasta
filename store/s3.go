@@ -9,6 +9,7 @@ import (
 
 //go:generate counterfeiter . MinioClient
 
+// MinioClient is the s3 client
 type MinioClient interface {
 	MakeBucket(string, string) error
 	BucketExists(string) (bool, error)
@@ -16,6 +17,7 @@ type MinioClient interface {
 	FGetObject(string, string, string) error
 }
 
+// S3Write is the function that writes to s3
 func S3Write(client MinioClient, bucketName, objectName, location string, content io.Reader) error {
 	exists, err := client.BucketExists(bucketName)
 	if err != nil {
@@ -37,6 +39,7 @@ func S3Write(client MinioClient, bucketName, objectName, location string, conten
 	return nil
 }
 
+// S3Read is the function that reads from s3
 func S3Read(client MinioClient, bucketName, objectName string) (string, error) {
 	tempFile, err := ioutil.TempFile("/tmp", "tempS3ObjectFile")
 	if err != nil {
