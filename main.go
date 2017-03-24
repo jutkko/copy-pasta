@@ -22,7 +22,7 @@ func main() {
 		Ui:          ui,
 	}
 
-	c := cli.NewCLI("copy-pasta", "0.0.1")
+	c := cli.NewCLI("copy-pasta", "0.1.1")
 
 	// no copy-pasta is passed down
 	c.Args = os.Args[1:]
