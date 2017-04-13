@@ -1,4 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/github/jutkko/copy-pasta/badge.svg?branch=master)](https://coveralls.io/github/jutkko/copy-pasta?branch=master)
 [![Build Status](https://travis-ci.org/jutkko/copy-pasta.svg?branch=master)](https://travis-ci.org/jutkko/copy-pasta)
 
 # How to use
