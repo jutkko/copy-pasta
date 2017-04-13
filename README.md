@@ -63,12 +63,15 @@ that briefly describes how `copy-past` works.
 
 <img src="/figures/how-it-works.png" width="750">
 
+The communicatin between the machines and the storage server is done in `SSL`,
+so we can assume that it is relatively safe.
+
 We can see that the things you copy into `copy-pasta` gets stored in plain text
-on the storage server. So the weakest link here will be the security of your
-backend store. Take S3 as an example, if your bucket is private and you
-haven't told anyone what your `ACCESSKEY` and `SECRETACCESSKEY`, you should be
-pretty safe. On the other hand, if the backend store is either public of
-compromised, the content copied to `copy-pasta` is in danger.
+on the storage server. The weakest link here will be the security of your
+backend store. Take S3 as an example, if your bucket is private and you haven't
+told anyone what your `ACCESSKEY` and `SECRETACCESSKEY`, you should be pretty
+safe. On the other hand, if the backend store is either public of compromised,
+the content copied to `copy-pasta` is in danger.
 
 In general it is **not** advised to copy confidential content to `copy-pasta`,
 `copy-pasta` is also **not** responsible for keeping the content secure. But if
@@ -77,7 +80,9 @@ the overwrite nature of `copy-pasta`, and quickly copy something else after
 having used the confidential content in `copy-pasta`.
 
 # Installation
-Looking good? There are two ways to install `copy-pasta`. Using go, do the following setup on the two machines you want to `copy-pasta`
+Looking good? Can't wait to hack with `copy-pasta`? There are two ways to
+install `copy-pasta`. Using go, do the following setup on the two machines you
+want to `copy-pasta`
 
 ```
 go get github.com/jutkko/copy-pasta
