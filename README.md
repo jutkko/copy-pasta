@@ -2,7 +2,7 @@
 
 # How to use
 ## Single lined stuff
- To copy, on one machine you do
+To copy, on one machine you do
 
 ```
 echo "I don't like ravioli" | copy-pasta
@@ -43,8 +43,8 @@ another user like
 
 ```
 copy-pasta login --target your-copy-pasta
-<Enter your S3 accesskey>
-<Enter your S3 secretaccesskey>
+<Enter your S3 ACCESSKEY>
+<Enter your S3 SECRETACCESSKEY>
 ```
 
 You can do
@@ -55,6 +55,26 @@ copy-pasta target your-copy-pasta
 
 You will be using another `copy-pasta` destination. **Note the credentials can
 be the same one!**
+
+## How does it work?
+I am super paranoid of security? Do you sweat if you copy your credentials into
+a copy buffer and leave it there? Then you should read on. Here is a diagram
+that briefly describes how `copy-past` works.
+
+<img src="/figures/how-it-works.png" width="750">
+
+We can see that the things you copy into `copy-pasta` gets stored in plain text
+on the storage server. So the weakest link here will be the security of your
+backend store. Take S3 as an example, if your bucket is private and you
+haven't told anyone what your `ACCESSKEY` and `SECRETACCESSKEY`, you should be
+pretty safe. On the other hand, if the backend store is either public of
+compromised, the content copied to `copy-pasta` is in danger.
+
+In general it is **not** advised to copy confidential content to `copy-pasta`,
+`copy-pasta` is also **not** responsible for keeping the content secure. But if
+you are a security lax person like me, you probable can take the advantage of
+the overwrite nature of `copy-pasta`, and quickly copy something else after
+having used the confidential content in `copy-pasta`.
 
 # Installation
 Looking good? There are two ways to install `copy-pasta`. Using go, do the following setup on the two machines you want to `copy-pasta`
@@ -74,8 +94,8 @@ Login on the machines you want to do `copy-pasta`
 
 ```
 copy-pasta login --target my-copy-pasta
-<Enter your S3 accesskey>
-<Enter your S3 secretaccesskey>
+<Enter your S3 ACCESSKEY>
+<Enter your S3 SECRETACCESSKEY>
 ```
 
 If you are not using Amazon S3, or your bucket locatin is  not in London you
