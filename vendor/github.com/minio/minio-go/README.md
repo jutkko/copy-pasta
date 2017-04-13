@@ -23,9 +23,7 @@ This document assumes that you have a working [Go development environment](https
 ## Download from Github
 
 ```sh
-
 go get -u github.com/minio/minio-go
-
 ```
 ## Initialize Minio Client
 
@@ -41,7 +39,6 @@ Minio client requires the following four parameters specified to connect to an A
 
 
 ```go
-
 package main
 
 import (
@@ -62,8 +59,6 @@ func main() {
 	}
 
 	log.Println("%v", minioClient) // minioClient is now setup
-
-
 ```
 
 ## Quick Start Example - File Uploader
@@ -131,14 +126,12 @@ func main() {
 #### Run FileUploader
 
 ```sh
-
 go run file-uploader.go
 2016/08/13 17:03:28 Successfully created mymusic 
 2016/08/13 17:03:40 Successfully uploaded golden-oldies.zip of size 16253413
 
 mc ls play/mymusic/
 [2016-05-27 16:02:16 PDT]  17MiB golden-oldies.zip
-
 ```
 
 ## API Reference
@@ -184,6 +177,11 @@ The full API Reference is available here.
 * [`RemoveObject`](https://docs.minio.io/docs/golang-client-api-reference#RemoveObject)
 * [`RemoveObjects`](https://docs.minio.io/docs/golang-client-api-reference#RemoveObjects)
 * [`RemoveIncompleteUpload`](https://docs.minio.io/docs/golang-client-api-reference#RemoveIncompleteUpload)
+
+### API Reference: Encrypted Object Operations
+
+* [`GetEncryptedObject`](https://docs.minio.io/docs/golang-client-api-reference#GetEncryptedObject)
+* [`PutEncryptedObject`](https://docs.minio.io/docs/golang-client-api-reference#PutEncryptedObject)
 
 ### API Reference : Presigned Operations
 
@@ -237,6 +235,11 @@ The full API Reference is available here.
 * [removeobject.go](https://github.com/minio/minio-go/blob/master/examples/s3/removeobject.go)
 * [removeincompleteupload.go](https://github.com/minio/minio-go/blob/master/examples/s3/removeincompleteupload.go)
 * [removeobjects.go](https://github.com/minio/minio-go/blob/master/examples/s3/removeobjects.go)
+
+#### Full Examples : Encrypted Object Operations
+
+* [put-encrypted-object.go](https://github.com/minio/minio-go/blob/master/examples/s3/put-encrypted-object.go)
+* [get-encrypted-object.go](https://github.com/minio/minio-go/blob/master/examples/s3/get-encrypted-object.go)
 
 #### Full Examples : Presigned Operations
 * [presignedgetobject.go](https://github.com/minio/minio-go/blob/master/examples/s3/presignedgetobject.go)

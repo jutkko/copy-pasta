@@ -21,28 +21,33 @@
 		},
 		{
 			"ImportPath": "github.com/minio/minio-go",
-			"Comment": "v2.0.3-6-g83ba3bc",
-			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
+		},
+		{
+			"ImportPath": "github.com/minio/minio-go/pkg/encrypt",
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
 		},
 		{
 			"ImportPath": "github.com/minio/minio-go/pkg/policy",
-			"Comment": "v2.0.3-6-g83ba3bc",
-			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
 		},
 		{
 			"ImportPath": "github.com/minio/minio-go/pkg/s3signer",
-			"Comment": "v2.0.3-6-g83ba3bc",
-			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
 		},
 		{
 			"ImportPath": "github.com/minio/minio-go/pkg/s3utils",
-			"Comment": "v2.0.3-6-g83ba3bc",
-			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
 		},
 		{
 			"ImportPath": "github.com/minio/minio-go/pkg/set",
-			"Comment": "v2.0.3-6-g83ba3bc",
-			"Rev": "83ba3bc20623438aa0e7157c4efee4091dfe5703"
+			"Comment": "v2.0.4-23-gb07bdc0",
+			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
