@@ -57,9 +57,9 @@ You will be using another `copy-pasta` destination. **Note the credentials can
 be the same one!**
 
 ## How does it work?
-Are you super paranoid of security? Do you sweat if you copy your credentials into
-a copy buffer and leave it there? Then you should read on. Here is a diagram
-that briefly describes how `copy-past` works.
+Are you super paranoid about security? Do you sweat if you copy your
+credentials into a copy buffer and leave it there? Then you should read on.
+Here is a diagram that briefly describes how `copy-pasta` works.
 
 <img src="/figures/how-it-works.png" width="750">
 
@@ -69,15 +69,15 @@ so we can assume that it is relatively safe.
 We can see that the things you copy into `copy-pasta` gets stored in plain text
 on the storage server. The weakest link here will be the security of your
 backend store. Take S3 as an example, if your bucket is private and you haven't
-told anyone what your `ACCESSKEY` and `SECRETACCESSKEY`, you should be pretty
-safe. On the other hand, if the backend store is either public of compromised,
+shared with anyone your `ACCESSKEY` and `SECRETACCESSKEY`, you should be pretty
+safe. On the other hand, if the backend store is either public or compromised,
 the content copied to `copy-pasta` is in danger.
 
 In general it is **not** advised to copy confidential content to `copy-pasta`,
 `copy-pasta` is also **not** responsible for keeping the content secure. But if
-you are a security lax person like me, you probable can take the advantage of
-the overwrite nature of `copy-pasta`, and quickly copy something else after
-having used the confidential content in `copy-pasta`.
+you are a security lax person like me, you probably can take the advantage of
+the overwrite nature of `copy-pasta`, copy confidential content, use it and
+quickly copy something else into `copy-pasta`.
 
 # Installation
 Looking good? Can't wait to hack with `copy-pasta`? There are two ways to
