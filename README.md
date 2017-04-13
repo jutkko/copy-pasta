@@ -57,10 +57,17 @@ You will be using another `copy-pasta` destination. **Note the credentials can
 be the same one!**
 
 # Installation
-To use, do the following setup on the two machines you want to `copy-pasta`
+Looking good? There are two ways to install `copy-pasta`. Using go, do the following setup on the two machines you want to `copy-pasta`
 
 ```
 go get github.com/jutkko/copy-pasta
+```
+
+Using `homebrew`, do
+
+```
+brew tap jutkko/homebrew-copy-pasta
+brew install copy-pasta
 ```
 
 Login on the machines you want to do `copy-pasta`
@@ -71,8 +78,28 @@ copy-pasta login --target my-copy-pasta
 <Enter your S3 secretaccesskey>
 ```
 
-If you are not using Amazon S3, and not in London you might want to pass the
-`endpoint` and `location` of your S3 backend implementation when you target.
+If you are not using Amazon S3, or your bucket locatin is  not in London you
+might want to pass the `endpoint` and `location` of your S3 backend
+implementation when you target.
+
+# Uninstall
+It depends on how you installed the binary. If by go, you should remove both
+the `copy-pasta` repo and the binary
+
+```
+rm -rf $GOPATH/src/github.com/jutkko/copy-pasta
+rm $GOPATH/bin/copy-pasta
+```
+
+If by homebrew, you can first remove the binary and then the tap
+
+```
+brew uninstall copy-pasta
+brew untap homebrew-copy-pasta
+```
+
+To remove the config file leftover by `copy-pasta`, simply delete the
+`.copy-pastarc` file in your `$HOME`.
 
 # Running the tests
 You will need to have a working go environment, and go to the repo
