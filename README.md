@@ -57,7 +57,7 @@ You will be using another `copy-pasta` destination. **Note the credentials can
 be the same one!**
 
 ## How does it work?
-I am super paranoid of security? Do you sweat if you copy your credentials into
+Are you super paranoid of security? Do you sweat if you copy your credentials into
 a copy buffer and leave it there? Then you should read on. Here is a diagram
 that briefly describes how `copy-past` works.
 
