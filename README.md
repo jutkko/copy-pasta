@@ -103,7 +103,7 @@ copy-pasta login --target my-copy-pasta
 <Enter your S3 SECRETACCESSKEY>
 ```
 
-If you are not using Amazon S3, or your bucket locatin is  not in London you
+If you are not using Amazon S3, or your bucket location is  not in London you
 might want to pass the `endpoint` and `location` of your S3 backend
 implementation when you target.
 
