@@ -63,7 +63,7 @@ Here is a diagram that briefly describes how `copy-pasta` works.
 
 <img src="/figures/how-it-works.png" width="750">
 
-The communicatin between the machines and the storage server is done in `SSL`,
+The communication between the machines and the storage server is done in `SSL`,
 so we can assume that it is relatively safe.
 
 We can see that the things you copy into `copy-pasta` gets stored in plain text
