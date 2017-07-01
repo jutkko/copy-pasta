@@ -107,6 +107,9 @@ If you are not using Amazon S3, or your bucket location is  not in London you
 might want to pass the `endpoint` and `location` of your S3 backend
 implementation when you target.
 
+If you are interested in using another storage solution, please let me know
+is the issues page and we get the conversation started.
+
 # Uninstall
 It depends on how you installed the binary. If by go, you should remove both
 the `copy-pasta` repo and the binary
