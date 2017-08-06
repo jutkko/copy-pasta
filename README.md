@@ -105,7 +105,9 @@ copy-pasta login --target my-copy-pasta
 
 If you are not using Amazon S3, or your bucket location is  not in London you
 might want to pass the `endpoint` and `location` of your S3 backend
-implementation when you target.
+implementation when you target. Currently S3 is the only backend type
+supported.  But I am trying to implement a new backend based on github's gists.
+Stay tuned.
 
 # Uninstall
 It depends on how you installed the binary. If by go, you should remove both
