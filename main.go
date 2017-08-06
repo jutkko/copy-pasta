@@ -33,7 +33,7 @@ func main() {
 		},
 
 		"login": func() (cli.Command, error) {
-			return &commands.LoginCommand{Ui: uiColored}, nil
+			return &commands.S3LoginCommand{Ui: uiColored}, nil
 		},
 
 		"target": func() (cli.Command, error) {

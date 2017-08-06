@@ -85,14 +85,14 @@ var pastas = []string{
 	"vermicelli",
 }
 
-// LoginCommand is the command that is responsible for logging in, the
+// S3LoginCommand is the command that is responsible for logging in, the
 // size effect is that it saves the config file locally
-type LoginCommand struct {
+type S3LoginCommand struct {
 	Ui cli.Ui
 }
 
 // Help string
-func (l *LoginCommand) Help() string {
+func (l *S3LoginCommand) Help() string {
 	return `Usage: copy-pasta login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
 
     Prompts to login interactively. If no target is provided,
@@ -106,7 +106,7 @@ Options:
 }
 
 // Run function for the command
-func (l *LoginCommand) Run(args []string) int {
+func (l *S3LoginCommand) Run(args []string) int {
 	loginCommand := flag.NewFlagSet("login", flag.ExitOnError)
 	loginTargetOption := loginCommand.String("target", "", "the name for copy-pasta's target")
 	loginEndpointOption := loginCommand.String("endpoint", "s3.amazonaws.com", "the endpoint for copy-pasta's backend")
@@ -142,7 +142,7 @@ func (l *LoginCommand) Run(args []string) int {
 }
 
 // Synopsis is the short help string
-func (l *LoginCommand) Synopsis() string {
+func (l *S3LoginCommand) Synopsis() string {
 	return fmt.Sprintf("Login to copy-pasta")
 }
 
