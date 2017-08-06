@@ -63,7 +63,7 @@ Here is a diagram that briefly describes how `copy-pasta` works.
 
 <img src="/figures/how-it-works.png" width="750">
 
-The communicatin between the machines and the storage server is done in `SSL`,
+The communication between the machines and the storage server is done in `SSL`,
 so we can assume that it is relatively safe.
 
 We can see that the things you copy into `copy-pasta` gets stored in plain text
@@ -108,6 +108,9 @@ might want to pass the `endpoint` and `location` of your S3 backend
 implementation when you target. Currently S3 is the only backend type
 supported.  But I am trying to implement a new backend based on github's gists.
 Stay tuned.
+
+If you are interested in using another storage solution, please let me know
+is the issues page and we get the conversation started.
 
 # Uninstall
 It depends on how you installed the binary. If by go, you should remove both
