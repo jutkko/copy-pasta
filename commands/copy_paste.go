@@ -9,7 +9,6 @@ import (
 	"github.com/jutkko/cli"
 	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store"
-	minio "github.com/minio/minio-go"
 )
 
 // InvalidConfig is the custom error struct for invalid configuration files
@@ -75,19 +74,16 @@ func (c *CopyPasteCommand) Synopsis() string {
 }
 
 func copyPaste(target *runcommands.Target, paste bool) (string, error) {
-	client, err := minioClient(target)
-	if err != nil {
-		return "", fmt.Errorf("failed initializing client: %s", err.Error())
-	}
+	store, _ := store.NewS3Store(target)
 
 	if isFromAPipe() && !paste {
-		if err = store.S3Write(client, target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
+		if err := store.Write(target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
 			return "", fmt.Errorf("failed writing to the bucket: %s", err.Error())
 		}
 
 		return "", nil
 	} else {
-		content, err := store.S3Read(client, target.BucketName, "default-object-name")
+		content, err := store.Read(target.BucketName, "default-object-name")
 		if err != nil {
 			return "", fmt.Errorf("Have you copied yet? Failed reading the bucket: %s", err.Error())
 		}
@@ -103,25 +99,6 @@ func isFromAPipe() bool {
 	}
 
 	return (stat.Mode() & os.ModeCharDevice) == 0
-}
-
-func minioClient(t *runcommands.Target) (*minio.Client, error) {
-	endpoint := t.Endpoint
-	accessKeyID := t.AccessKey
-	secretAccessKey := t.SecretAccessKey
-	useSSL := true
-
-	// Initialize minio client object
-	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
-}
-
-func getOrElse(key, defaultValue string) string {
-	result := os.Getenv(key)
-	if result == "" {
-		return defaultValue
-	}
-
-	return result
 }
 
 func loadRunCommands() (*runcommands.Config, *InvalidConfig) {

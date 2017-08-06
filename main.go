@@ -32,7 +32,7 @@ func main() {
 			return &commands.CopyPasteCommand{Ui: uiColored}, nil
 		},
 
-		"login": func() (cli.Command, error) {
+		"s3-login": func() (cli.Command, error) {
 			return &commands.S3LoginCommand{Ui: uiColored}, nil
 		},
 

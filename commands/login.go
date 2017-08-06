@@ -93,10 +93,10 @@ type S3LoginCommand struct {
 
 // Help string
 func (l *S3LoginCommand) Help() string {
-	return `Usage: copy-pasta login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
+	return `Usage: copy-pasta s3-login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
 
-    Prompts to login interactively. If no target is provided,
-    the  "default" target naem is provided.
+		Prompts to login interactively. The command expects S3 credentials. If no
+		target is provided, the  "default" target naem is provided.
 
 Options:
     --target       Specify the new target name.
@@ -143,7 +143,7 @@ func (l *S3LoginCommand) Run(args []string) int {
 
 // Synopsis is the short help string
 func (l *S3LoginCommand) Synopsis() string {
-	return fmt.Sprintf("Login to copy-pasta")
+	return fmt.Sprintf("Login to copy-pasta with S3 backend")
 }
 
 func getBucketName(salt string) string {

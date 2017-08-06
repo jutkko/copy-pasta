@@ -107,7 +107,7 @@ targets:
 
 		Context("--paste", func() {
 			It("should just paste even though there is stdin pipe to it", func() {
-				args = []string{"login", "--target", "myPasteTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myPasteTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				writeContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -154,10 +154,10 @@ targets:
 			})
 		})
 
-		Context("login", func() {
+		Context("s3-login", func() {
 			// this example uses the test minio endpoint
 			It("should prompt for credentials and next time it should work", func() {
-				args = []string{"login", "--target", "myTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myTarget", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				writeContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -197,10 +197,10 @@ targets:
 			})
 		})
 
-		Context("target", func() {
+		Context("s3-target", func() {
 			// this example uses the test minio endpoint
 			It("should change to the newly specified target", func() {
-				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -233,7 +233,7 @@ targets:
 				Expect(session.ExitCode()).To(Equal(0))
 
 				// login as another target
-				args = []string{"login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent = []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe = getStdinPipe()
@@ -291,7 +291,7 @@ targets:
 
 			Context("when there is no target", func() {
 				It("should display the current target", func() {
-					args = []string{"login", "--target", "myTargetOne"}
+					args = []string{"s3-login", "--target", "myTargetOne"}
 					createCmd()
 					loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 					stdinPipe := getStdinPipe()
@@ -314,9 +314,9 @@ targets:
 			})
 		})
 
-		Context("targets", func() {
+		Context("s3-targets", func() {
 			It("should list the targets", func() {
-				args = []string{"login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myTargetOne", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				loginWriteContent := []byte("Q3AM3UQ867SPQQA43P2F\nzuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG\n")
 				stdinPipe := getStdinPipe()
@@ -332,7 +332,7 @@ targets:
 				Eventually(filepath.Join(userHomeDir(), ".copy-pastarc")).Should(BeAnExistingFile())
 				Expect(err).ToNot(HaveOccurred())
 
-				args = []string{"login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
+				args = []string{"s3-login", "--target", "myTargetTwo", "--endpoint", "play.minio.io:9000", "--location", "us-east-1"}
 				createCmd()
 				stdinPipe = getStdinPipe()
 				_, err = stdinPipe.Write(loginWriteContent)
