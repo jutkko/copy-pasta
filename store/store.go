@@ -1,6 +1,7 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -16,12 +17,15 @@ type Store interface {
 
 // Only do s3 for now
 func NewStore(target *runcommands.Target) (Store, error) {
-	client, err := minioClient(target)
-	if err != nil {
-		return nil, fmt.Errorf("Failed initializing client: %s", err.Error())
+	if target.Backend == "s3" {
+		client, err := minioClient(target)
+		if err != nil {
+			return nil, fmt.Errorf("Failed initializing client: %s", err.Error())
+		}
+		return s3.NewS3Store(client, target), nil
 	}
 
-	return s3.NewS3Store(client, target), nil
+	return nil, errors.New(fmt.Sprintf("Invalid backend: %s", target.Backend))
 }
 
 func minioClient(t *runcommands.Target) (*minio.Client, error) {

@@ -131,7 +131,7 @@ func (l *S3LoginCommand) Run(args []string) int {
 		return 10
 	}
 
-	if err := runcommands.Update(*loginTargetOption, accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption), *loginEndpointOption, *loginLocationOption); err != nil {
+	if err := runcommands.Update(*loginTargetOption, "s3", accessKey, secretAccessKey, getBucketName(accessKey+*loginTargetOption), *loginEndpointOption, *loginLocationOption); err != nil {
 		l.Ui.Error(fmt.Sprintf("Failed to update the current target: %s\n", err.Error()))
 		return 9
 	}

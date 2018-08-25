@@ -33,6 +33,7 @@ var _ = Describe("Rc", func() {
 				copyPastaRc = filepath.Join(userHomeDir(), ".copy-pastarc")
 				copyPastaRcContents := `currenttarget:
   name: mycurrenttarget
+  backend: s3
   accesskey: current-key
   secretaccesskey: current-secret-key
   bucketname: current-bucket-name
@@ -41,6 +42,7 @@ var _ = Describe("Rc", func() {
 targets:
   mycurrenttarget:
     name: mycurrenttarget
+    backend: s3
     accesskey: current-key
     secretaccesskey: current-secret-key
     bucketname: current-bucket-name
@@ -48,6 +50,7 @@ targets:
     location: current-location
   another-target:
     name: another-target
+    backend: s3
     accesskey: another-key
     secretaccesskey: another-secret-key
     bucketname: another-bucket-name
@@ -61,11 +64,11 @@ targets:
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "mycurrenttarget", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
+				checkTarget(currentTarget, "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
 
 				targets := config.Targets
-				checkTarget(targets["mycurrenttarget"], "mycurrenttarget", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
-				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["mycurrenttarget"], "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
+				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 			})
 		})
 
@@ -107,6 +110,7 @@ targets:
 			BeforeEach(func() {
 				copyPastaRcContents := `currenttarget:
   name: some-target
+  backend: s3
   accesskey: some-key
   secretaccesskey: some-secret-key
   bucketname: some-bucket-name
@@ -115,6 +119,7 @@ targets:
 targets:
   some-target:
     name: some-target
+    backend: s3
     accesskey: some-key
     secretaccesskey: some-secret-key
     bucketname: some-bucket-name
@@ -124,19 +129,19 @@ targets:
 			})
 
 			It("updates the current .copy-pastarc and sets the current target to target", func() {
-				err := runcommands.Update("another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				err := runcommands.Update("another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(currentTarget, "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(2))
-				checkTarget(targets["some-target"], "some-target", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
-				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 			})
 		})
 
@@ -155,18 +160,18 @@ targets:
 			})
 
 			It("creates a new .copy-pastarc", func() {
-				err := runcommands.Update("another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				err := runcommands.Update("another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(currentTarget, "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				checkTarget(targets["another-target"], "another-target", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
 
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
@@ -174,26 +179,27 @@ targets:
 
 		Context("when there is no target to start with", func() {
 			It("should create a new .copy-pasta file with the passed in credentials", func() {
-				err := runcommands.Update("some-target", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				err := runcommands.Update("some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "some-target", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				checkTarget(currentTarget, "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				checkTarget(targets["some-target"], "some-target", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
 		})
 	})
 })
 
-func checkTarget(t *runcommands.Target, name, accessKey, secretAccessKey, bucketName, endpoint, location string) {
+func checkTarget(t *runcommands.Target, name, backend, accessKey, secretAccessKey, bucketName, endpoint, location string) {
 	Expect(t.Name).To(Equal(name))
+	Expect(t.Backend).To(Equal(backend))
 	Expect(t.AccessKey).To(Equal(accessKey))
 	Expect(t.SecretAccessKey).To(Equal(secretAccessKey))
 	Expect(t.BucketName).To(Equal(bucketName))

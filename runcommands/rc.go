@@ -12,6 +12,7 @@ import (
 // Target is the strut for a copy-pasta target
 type Target struct {
 	Name            string `yaml:"name"`
+	Backend         string `yaml:"backend"`
 	AccessKey       string `yaml:"accesskey"`
 	SecretAccessKey string `yaml:"secretaccesskey"`
 	BucketName      string `yaml:"bucketname"`
@@ -26,7 +27,7 @@ type Config struct {
 }
 
 // Update updates the config file
-func Update(target, accessKey, secretAccessKey, bucketName, endpoint, location string) error {
+func Update(target, backend, accessKey, secretAccessKey, bucketName, endpoint, location string) error {
 	var config *Config
 	var err error
 
@@ -40,6 +41,7 @@ func Update(target, accessKey, secretAccessKey, bucketName, endpoint, location s
 
 	currentTarget := &Target{
 		Name:            target,
+		Backend:         backend,
 		AccessKey:       accessKey,
 		SecretAccessKey: secretAccessKey,
 		BucketName:      bucketName,
