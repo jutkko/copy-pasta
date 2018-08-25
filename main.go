@@ -24,7 +24,7 @@ func main() {
 
 	c := cli.NewCLI("copy-pasta", "0.1.1")
 
-	// no copy-pasta is passed down
+	// "copy-pasta" program name is not passed down
 	c.Args = os.Args[1:]
 
 	c.Commands = map[string]cli.CommandFactory{

@@ -73,6 +73,7 @@ func (c *CopyPasteCommand) Synopsis() string {
 	return "Copy or paste using copy-pasta"
 }
 
+// copyPaste function deals with both copying and pasting
 func copyPaste(target *runcommands.Target, paste bool) (string, error) {
 	store, _ := store.NewS3Store(target)
 
