@@ -28,6 +28,7 @@ var _ = Describe("Main", func() {
 				copyPastaRc = filepath.Join(userHomeDir(), ".copy-pastarc")
 				copyPastaRcContents := `currenttarget:
   name: some-target
+  backend: s3
   accesskey: Q3AM3UQ867SPQQA43P2F
   secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
   bucketname: bucket-name
@@ -36,6 +37,7 @@ var _ = Describe("Main", func() {
 targets:
   some-target:
     name: some-target
+    backend: s3
     accesskey: Q3AM3UQ867SPQQA43P2F
     secretaccesskey: zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
     bucketname: bucket-name
