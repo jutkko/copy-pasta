@@ -75,16 +75,19 @@ func (c *CopyPasteCommand) Synopsis() string {
 
 // copyPaste function deals with both copying and pasting
 func copyPaste(target *runcommands.Target, paste bool) (string, error) {
-	store, _ := store.NewS3Store(target)
+	store, err := store.NewStore(target)
+	if err != nil {
+		return "", fmt.Errorf("Failed to create from store, check rc config: %s", err.Error())
+	}
 
 	if isFromAPipe() && !paste {
-		if err := store.Write(target.BucketName, "default-object-name", target.Location, os.Stdin); err != nil {
-			return "", fmt.Errorf("failed writing to the bucket: %s", err.Error())
+		if err := store.Write(os.Stdin); err != nil {
+			return "", fmt.Errorf("Failed writing to the bucket: %s", err.Error())
 		}
 
 		return "", nil
 	} else {
-		content, err := store.Read(target.BucketName, "default-object-name")
+		content, err := store.Read()
 		if err != nil {
 			return "", fmt.Errorf("Have you copied yet? Failed reading the bucket: %s", err.Error())
 		}

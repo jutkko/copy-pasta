@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 
+	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store/s3"
 	"github.com/jutkko/copy-pasta/store/s3/storefakes"
 	. "github.com/onsi/ginkgo"
@@ -15,19 +16,23 @@ import (
 var _ = Describe("S3", func() {
 	Describe("Write", func() {
 		var (
-			fakeClient                                         *storefakes.FakeMinioClient
-			exampleContent                                     io.Reader
-			actualBucketName, actualObjectName, actualLoaction string
-			testStore                                          *s3.S3Store
+			fakeClient                       *storefakes.FakeMinioClient
+			actualTarget                     *runcommands.Target
+			exampleContent                   io.Reader
+			actualBucketName, actualLoaction string
+			testStore                        *s3.S3Store
 		)
 
 		BeforeEach(func() {
 			exampleContent = bytes.NewReader([]byte("He is a banana\nand an apple"))
 			fakeClient = new(storefakes.FakeMinioClient)
 			actualBucketName = "this-bucket"
-			actualObjectName = "this-object"
 			actualLoaction = "that-location"
-			testStore = &s3.S3Store{MinioClient: fakeClient}
+			actualTarget = &runcommands.Target{
+				BucketName: actualBucketName,
+				Location:   actualLoaction,
+			}
+			testStore = s3.NewS3Store(fakeClient, actualTarget)
 		})
 
 		Context("when the bucket exists command returns an error", func() {
@@ -36,7 +41,7 @@ var _ = Describe("S3", func() {
 			})
 
 			It("should return the error", func() {
-				err := testStore.Write(actualBucketName, actualObjectName, actualLoaction, exampleContent)
+				err := testStore.Write(exampleContent)
 				Expect(err).To(MatchError("No action should be taken"))
 			})
 		})
@@ -47,7 +52,7 @@ var _ = Describe("S3", func() {
 			})
 
 			It("should create it and put the object there", func() {
-				err := testStore.Write(actualBucketName, actualObjectName, actualLoaction, exampleContent)
+				err := testStore.Write(exampleContent)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeClient.BucketExistsCallCount()).To(Equal(1))
@@ -62,7 +67,7 @@ var _ = Describe("S3", func() {
 				Expect(fakeClient.PutObjectCallCount()).To(Equal(1))
 				bucketName, objectName, reader, contentType := fakeClient.PutObjectArgsForCall(0)
 				Expect(bucketName).To(Equal(actualBucketName))
-				Expect(objectName).To(Equal(actualObjectName))
+				Expect(objectName).To(Equal(s3.DefaultObjectName))
 				Expect(reader).To(Equal(exampleContent))
 				Expect(contentType).To(Equal("text/html"))
 			})
@@ -73,7 +78,7 @@ var _ = Describe("S3", func() {
 				})
 
 				It("should return a corresponding error", func() {
-					err := testStore.Write(actualBucketName, actualObjectName, actualLoaction, exampleContent)
+					err := testStore.Write(exampleContent)
 					Expect(err).To(MatchError("Arrr"))
 					Expect(fakeClient.BucketExistsCallCount()).To(Equal(1))
 					bucketName := fakeClient.BucketExistsArgsForCall(0)
@@ -95,7 +100,7 @@ var _ = Describe("S3", func() {
 			})
 
 			It("should create an object in the bucket", func() {
-				err := testStore.Write(actualBucketName, actualObjectName, actualLoaction, exampleContent)
+				err := testStore.Write(exampleContent)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(fakeClient.BucketExistsCallCount()).To(Equal(1))
@@ -107,7 +112,7 @@ var _ = Describe("S3", func() {
 				Expect(fakeClient.PutObjectCallCount()).To(Equal(1))
 				bucketName, objectName, reader, contentType := fakeClient.PutObjectArgsForCall(0)
 				Expect(bucketName).To(Equal(actualBucketName))
-				Expect(objectName).To(Equal(actualObjectName))
+				Expect(objectName).To(Equal(s3.DefaultObjectName))
 				Expect(reader).To(Equal(exampleContent))
 				Expect(contentType).To(Equal("text/html"))
 			})
@@ -118,7 +123,7 @@ var _ = Describe("S3", func() {
 				})
 
 				It("should return the error", func() {
-					err := testStore.Write(actualBucketName, actualObjectName, actualLoaction, exampleContent)
+					err := testStore.Write(exampleContent)
 					Expect(err).To(MatchError("Hey don't put!"))
 
 					Expect(fakeClient.BucketExistsCallCount()).To(Equal(1))
@@ -135,30 +140,34 @@ var _ = Describe("S3", func() {
 
 	Describe("Read", func() {
 		var (
-			fakeClient                         *storefakes.FakeMinioClient
-			actualBucketName, actualObjectName string
-			actualContent                      []byte
-			testStore                          *s3.S3Store
+			actualContent                    []byte
+			fakeClient                       *storefakes.FakeMinioClient
+			actualTarget                     *runcommands.Target
+			actualBucketName, actualLoaction string
+			testStore                        *s3.S3Store
 		)
 
 		BeforeEach(func() {
 			fakeClient = new(storefakes.FakeMinioClient)
 			actualBucketName = "read-bucket"
-			actualObjectName = "read-thing"
 			actualContent = []byte("Arrgggh!\nOooops")
-			testStore = &s3.S3Store{MinioClient: fakeClient}
+			actualTarget = &runcommands.Target{
+				BucketName: actualBucketName,
+				Location:   actualLoaction,
+			}
+			testStore = s3.NewS3Store(fakeClient, actualTarget)
 		})
 
 		It("should return the string", func() {
 			fakeClient.FGetObjectStub = func(bucketName, objectName, filePath string) error {
-				if bucketName == "read-bucket" && objectName == "read-thing" {
+				if bucketName == "read-bucket" && objectName == s3.DefaultObjectName {
 					err := ioutil.WriteFile(filePath, actualContent, 0600)
 					Expect(err).ToNot(HaveOccurred())
 				}
 				return nil
 			}
 
-			content, err := testStore.Read(actualBucketName, actualObjectName)
+			content, err := testStore.Read()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(content).To(Equal(string(actualContent)))
 		})
@@ -175,7 +184,7 @@ var _ = Describe("S3", func() {
 			It("should return the corresponding error", func() {
 				fakeClient.FGetObjectReturns(errors.New("Yo-failed"))
 
-				_, err := testStore.Read(actualBucketName, actualObjectName)
+				_, err := testStore.Read()
 				Expect(err).To(MatchError("Yo-failed"))
 			})
 
