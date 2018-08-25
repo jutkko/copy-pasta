@@ -96,7 +96,7 @@ func (l *S3LoginCommand) Help() string {
 	return `Usage: copy-pasta s3-login [--target] [<target>] [--endpoint] [<endpoint>] [--location] [<location>]
 
 		Prompts to login interactively. The command expects S3 credentials. If no
-		target is provided, the  "default" target naem is provided.
+		target is provided, the "default" target name is provided.
 
 Options:
     --target       Specify the new target name.
