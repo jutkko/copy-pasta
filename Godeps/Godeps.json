@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/jutkko/copy-pasta",
-	"GoVersion": "go1.8",
-	"GodepVersion": "v79",
+	"GoVersion": "go1.10",
+	"GodepVersion": "v80",
 	"Deps": [
 		{
 			"ImportPath": "github.com/armon/go-radix",
@@ -10,6 +10,15 @@
 		{
 			"ImportPath": "github.com/bgentry/speakeasy",
 			"Rev": "675b82c74c0ed12283ee81ba8a534c8982c07b85"
+		},
+		{
+			"ImportPath": "github.com/google/go-github/github",
+			"Comment": "v17.0.0-4-gd773212",
+			"Rev": "d7732128a00e8e95e8fe896017da18ee20b2180d"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 		},
 		{
 			"ImportPath": "github.com/jutkko/cli",
@@ -48,6 +57,22 @@
 			"ImportPath": "github.com/minio/minio-go/pkg/set",
 			"Comment": "v2.0.4-23-gb07bdc0",
 			"Rev": "b07bdc006df8a25759cc44b881fb3bdd7881d47b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "8a410e7b638dca158bf9e766925842f6651ff828"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context/ctxhttp",
+			"Rev": "8a410e7b638dca158bf9e766925842f6651ff828"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "d2e6202438beef2727060aa7cabdd924d92ebfd9"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2/internal",
+			"Rev": "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
