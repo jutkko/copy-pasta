@@ -15,15 +15,14 @@ import (
 var _ = Describe("S3", func() {
 	Describe("Write", func() {
 		var (
-			fakeGistClient              *gistfakes.FakeGistClient
-			actualTarget                *runcommands.Target
-			writeContent, token, gistID string
-			testStore                   *gist.GistStore
+			fakeGistClient *gistfakes.FakeGistClient
+			actualTarget   *runcommands.Target
+			token, gistID  string
+			testStore      *gist.GistStore
 		)
 
 		BeforeEach(func() {
 			fakeGistClient = new(gistfakes.FakeGistClient)
-			writeContent = "This is a secret"
 			token = "my-token"
 			gistID = "gist-IDID"
 		})
