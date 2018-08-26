@@ -18,6 +18,8 @@ type Target struct {
 	BucketName      string `yaml:"bucketname"`
 	Endpoint        string `yaml:"endpoint"`
 	Location        string `yaml:"location"`
+	GistToken       string `yaml:"gisttoken"`
+	GistID          string `yaml:"gistID"`
 }
 
 // Config is the aggregation of currrent targets
@@ -27,7 +29,7 @@ type Config struct {
 }
 
 // Update updates the config file
-func Update(target, backend, accessKey, secretAccessKey, bucketName, endpoint, location string) error {
+func Update(target, backend, accessKey, secretAccessKey, bucketName, endpoint, location, gistToken, gistID string) error {
 	var config *Config
 	var err error
 
@@ -47,6 +49,8 @@ func Update(target, backend, accessKey, secretAccessKey, bucketName, endpoint, l
 		BucketName:      bucketName,
 		Endpoint:        endpoint,
 		Location:        location,
+		GistToken:       gistToken,
+		GistID:          gistID,
 	}
 
 	config.CurrentTarget = currentTarget

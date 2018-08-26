@@ -11,9 +11,8 @@ import (
 
 const DefaultObjectName = "default-object-name"
 
-//go:generate counterfeiter . MinioClient
-
-// MinioClient is the s3 client
+//go:generate counterfeiter . minioClient
+// minioClient is the s3 client
 type MinioClient interface {
 	MakeBucket(string, string) error
 	BucketExists(string) (bool, error)
@@ -22,32 +21,32 @@ type MinioClient interface {
 }
 
 type S3Store struct {
-	MinioClient MinioClient
+	minioClient MinioClient
 	target      *runcommands.Target
 }
 
 func NewS3Store(client MinioClient, target *runcommands.Target) *S3Store {
 	return &S3Store{
-		MinioClient: client,
+		minioClient: client,
 		target:      target,
 	}
 }
 
 // S3Write is the function that writes to s3
 func (s *S3Store) Write(content io.Reader) error {
-	exists, err := s.MinioClient.BucketExists(s.target.BucketName)
+	exists, err := s.minioClient.BucketExists(s.target.BucketName)
 	if err != nil {
 		return err
 	}
 
 	if exists == false {
-		err := s.MinioClient.MakeBucket(s.target.BucketName, s.target.Location)
+		err := s.minioClient.MakeBucket(s.target.BucketName, s.target.Location)
 		if err != nil {
 			return err
 		}
 	}
 
-	_, err = s.MinioClient.PutObject(s.target.BucketName, DefaultObjectName, content, "text/html")
+	_, err = s.minioClient.PutObject(s.target.BucketName, DefaultObjectName, content, "text/html")
 	if err != nil {
 		return err
 	}
@@ -70,7 +69,7 @@ func (s *S3Store) Read() (string, error) {
 		}
 	}()
 
-	err = s.MinioClient.FGetObject(s.target.BucketName, DefaultObjectName, tempFile.Name())
+	err = s.minioClient.FGetObject(s.target.BucketName, DefaultObjectName, tempFile.Name())
 	if err != nil {
 		return "", err
 	}

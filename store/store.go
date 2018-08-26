@@ -1,13 +1,17 @@
 package store
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
 
+	"github.com/google/go-github/github"
 	"github.com/jutkko/copy-pasta/runcommands"
+	"github.com/jutkko/copy-pasta/store/gist"
 	"github.com/jutkko/copy-pasta/store/s3"
 	minio "github.com/minio/minio-go"
+	"golang.org/x/oauth2"
 )
 
 type Store interface {
@@ -25,6 +29,10 @@ func NewStore(target *runcommands.Target) (Store, error) {
 		return s3.NewS3Store(client, target), nil
 	}
 
+	if target.Backend == "gist" {
+		return gist.NewGistStore(gistClient(target), target), nil
+	}
+
 	return nil, errors.New(fmt.Sprintf("Invalid backend: %s", target.Backend))
 }
 
@@ -36,4 +44,14 @@ func minioClient(t *runcommands.Target) (*minio.Client, error) {
 
 	// Initialize minio client object
 	return minio.New(endpoint, accessKeyID, secretAccessKey, useSSL)
+}
+
+func gistClient(t *runcommands.Target) gist.GistClient {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: t.GistToken},
+	)
+	tc := oauth2.NewClient(context.Background(), ts)
+
+	client := github.NewClient(tc)
+	return client.Gists
 }

@@ -50,12 +50,8 @@ targets:
     location: current-location
   another-target:
     name: another-target
-    backend: s3
-    accesskey: another-key
-    secretaccesskey: another-secret-key
-    bucketname: another-bucket-name
-    endpoint: another-endpoint
-    location: another-location`
+    backend: gist
+    gisttoken: 0xdeadbeef`
 				ioutil.WriteFile(copyPastaRc, []byte(copyPastaRcContents), 0600)
 			})
 
@@ -64,11 +60,11 @@ targets:
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
+				checkTarget(currentTarget, "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location", "", "")
 
 				targets := config.Targets
-				checkTarget(targets["mycurrenttarget"], "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location")
-				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["mycurrenttarget"], "mycurrenttarget", "s3", "current-key", "current-secret-key", "current-bucket-name", "current-endpoint", "current-location", "", "")
+				checkTarget(targets["another-target"], "another-target", "gist", "", "", "", "", "", "0xdeadbeef", "")
 			})
 		})
 
@@ -129,19 +125,19 @@ targets:
 			})
 
 			It("updates the current .copy-pastarc and sets the current target to target", func() {
-				err := runcommands.Update("another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				err := runcommands.Update("another-target", "gist", "", "", "", "", "", "hiyo", "my-gist-id")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(currentTarget, "another-target", "gist", "", "", "", "", "", "hiyo", "my-gist-id")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(2))
-				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
-				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location", "", "")
+				checkTarget(targets["another-target"], "another-target", "gist", "", "", "", "", "", "hiyo", "my-gist-id")
 			})
 		})
 
@@ -160,18 +156,18 @@ targets:
 			})
 
 			It("creates a new .copy-pastarc", func() {
-				err := runcommands.Update("another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				err := runcommands.Update("another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location", "", "")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(currentTarget, "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location", "", "")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location")
+				checkTarget(targets["another-target"], "another-target", "s3", "another-key", "another-secret-key", "another-bucket-name", "another-endpoint", "another-location", "", "")
 
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
@@ -179,25 +175,25 @@ targets:
 
 		Context("when there is no target to start with", func() {
 			It("should create a new .copy-pasta file with the passed in credentials", func() {
-				err := runcommands.Update("some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				err := runcommands.Update("some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location", "", "")
 				Expect(err).ToNot(HaveOccurred())
 
 				config, err := runcommands.Load()
 				Expect(err).ToNot(HaveOccurred())
 
 				currentTarget := config.CurrentTarget
-				checkTarget(currentTarget, "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				checkTarget(currentTarget, "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location", "", "")
 
 				targets := config.Targets
 				Expect(len(targets)).To(Equal(1))
-				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location")
+				checkTarget(targets["some-target"], "some-target", "s3", "some-key", "some-secret-key", "some-bucket-name", "some-endpoint", "some-location", "", "")
 				Expect(filepath.Join(userHomeDir(), ".copy-pastarc")).To(BeAnExistingFile())
 			})
 		})
 	})
 })
 
-func checkTarget(t *runcommands.Target, name, backend, accessKey, secretAccessKey, bucketName, endpoint, location string) {
+func checkTarget(t *runcommands.Target, name, backend, accessKey, secretAccessKey, bucketName, endpoint, location, gistToken, gistID string) {
 	Expect(t.Name).To(Equal(name))
 	Expect(t.Backend).To(Equal(backend))
 	Expect(t.AccessKey).To(Equal(accessKey))
@@ -205,6 +201,8 @@ func checkTarget(t *runcommands.Target, name, backend, accessKey, secretAccessKe
 	Expect(t.BucketName).To(Equal(bucketName))
 	Expect(t.Endpoint).To(Equal(endpoint))
 	Expect(t.Location).To(Equal(location))
+	Expect(t.GistToken).To(Equal(gistToken))
+	Expect(t.GistID).To(Equal(gistID))
 }
 
 func userHomeDir() string {

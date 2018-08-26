@@ -8,7 +8,7 @@ import (
 
 	"github.com/jutkko/copy-pasta/runcommands"
 	"github.com/jutkko/copy-pasta/store/s3"
-	"github.com/jutkko/copy-pasta/store/s3/storefakes"
+	"github.com/jutkko/copy-pasta/store/s3/s3fakes"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -16,7 +16,7 @@ import (
 var _ = Describe("S3", func() {
 	Describe("Write", func() {
 		var (
-			fakeClient                       *storefakes.FakeMinioClient
+			fakeClient                       *s3fakes.FakeMinioClient
 			actualTarget                     *runcommands.Target
 			exampleContent                   io.Reader
 			actualBucketName, actualLoaction string
@@ -25,7 +25,7 @@ var _ = Describe("S3", func() {
 
 		BeforeEach(func() {
 			exampleContent = bytes.NewReader([]byte("He is a banana\nand an apple"))
-			fakeClient = new(storefakes.FakeMinioClient)
+			fakeClient = new(s3fakes.FakeMinioClient)
 			actualBucketName = "this-bucket"
 			actualLoaction = "that-location"
 			actualTarget = &runcommands.Target{
@@ -141,14 +141,14 @@ var _ = Describe("S3", func() {
 	Describe("Read", func() {
 		var (
 			actualContent                    []byte
-			fakeClient                       *storefakes.FakeMinioClient
+			fakeClient                       *s3fakes.FakeMinioClient
 			actualTarget                     *runcommands.Target
 			actualBucketName, actualLoaction string
 			testStore                        *s3.S3Store
 		)
 
 		BeforeEach(func() {
-			fakeClient = new(storefakes.FakeMinioClient)
+			fakeClient = new(s3fakes.FakeMinioClient)
 			actualBucketName = "read-bucket"
 			actualContent = []byte("Arrgggh!\nOooops")
 			actualTarget = &runcommands.Target{

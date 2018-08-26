@@ -22,7 +22,7 @@ func main() {
 		Ui:          ui,
 	}
 
-	c := cli.NewCLI("copy-pasta", "0.1.1")
+	c := cli.NewCLI("copy-pasta", "0.1.2")
 
 	// "copy-pasta" program name is not passed down
 	c.Args = os.Args[1:]
@@ -34,6 +34,10 @@ func main() {
 
 		"s3-login": func() (cli.Command, error) {
 			return &commands.S3LoginCommand{Ui: uiColored}, nil
+		},
+
+		"gist-login": func() (cli.Command, error) {
+			return &commands.GistLoginCommand{Ui: uiColored}, nil
 		},
 
 		"target": func() (cli.Command, error) {

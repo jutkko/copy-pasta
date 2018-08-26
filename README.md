@@ -109,8 +109,11 @@ implementation when you target. Currently S3 is the only backend type
 supported.  But I am trying to implement a new backend based on github's gists.
 Stay tuned.
 
+It is also possible to use github gists as the backend storage. Please see 
+`copy-pasta gist-login --help`.
+
 If you are interested in using another storage solution, please let me know
-is the issues page and we get the conversation started.
+in the issues page and we get the conversation started.
 
 # Uninstall
 It depends on how you installed the binary. If by go, you should remove both
