@@ -8,5 +8,8 @@ image_resource:
 inputs:
 - name: copy-pasta
 
+caches:
+- path: gopath/
+
 run:
   path: copy-pasta/ci/test

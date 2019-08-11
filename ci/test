@@ -7,5 +7,9 @@ export PATH=$PWD/gopath/bin:$PATH
 
 cd copy-pasta
 
+ echo "installing ginkgo..."
+ go install github.com/onsi/ginkgo/ginkgo
+
 echo "$GOPATH"
 echo "running tests..."
+ginkgo -r
