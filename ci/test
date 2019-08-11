@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu
+
+export GOPATH=$PWD/gopath
+export PATH=$PWD/gopath/bin:$PATH
+
+cd copy-pasta
+
+echo "$GOPATH"
+echo "running tests..."

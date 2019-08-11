@@ -1,0 +1,12 @@
+---
+platform: linux
+
+image_resource:
+  type: registry-image
+  source: {repository: golang}
+
+inputs:
+- name: copy-pasta
+
+run:
+  path: copy-pasta/ci/test
