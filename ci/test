@@ -7,9 +7,10 @@ export PATH=$PWD/gopath/bin:$PATH
 
 cd copy-pasta
 
- echo "installing ginkgo..."
- go install github.com/onsi/ginkgo/ginkgo
+echo "installing ginkgo..."
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gemega/...
 
 echo "$GOPATH"
 echo "running tests..."
-ginkgo -r
+go test ./...
